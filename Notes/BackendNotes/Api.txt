@@ -1,0 +1,8 @@
+API : Application Programming Interface
+
+Api , simply Man inthe Middle : 
+
+
+waiter = Api
+customer -req- waiter -- Cheff
+customer -res- waiter -order- Cheff

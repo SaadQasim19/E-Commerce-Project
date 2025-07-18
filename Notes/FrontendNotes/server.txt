@@ -1,0 +1,16 @@
+we dont want to write server link here , so we will add it in vite.config.js
+
+await fetch("http://localhost:8000/api/products")
+
+
+What we will do : 
+
+  plugins: [react()],
+  server:{
+    proxy:{
+      "/api":{
+        target:"http://localhost:8000",
+      }
+    }
+  }
+})

@@ -1,0 +1,26 @@
+How to deploy :
+For Express:
+
+import path from 'path';
+const _dirname = path.resolve();
+
+--underApi--
+if(process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(_dirname, '/Frontend/dist')))
+  
+-- index.html will come from the dist folder--
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(_dirname, '/Frontend/dist/index.html'));
+    OR
+    res.sendFile(path.resolve(_dirname, "Frontend","dist", "index.html"));
+
+  });
+  
+  };
+  
+we get dist folder by running:
+npm run build 
+
+
+when we deploy code to github, we delete our node_modules folder and .env file.

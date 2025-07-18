@@ -1,0 +1,2 @@
+req.body = for usually Post , Patch , Put methods . 
+req.params = for Urls 

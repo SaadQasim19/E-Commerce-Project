@@ -1,0 +1,39 @@
+zustand is a state management tool , less complex than Redux & Context Api.
+
+npm i zustand
+
+Syntax:
+import { create } from 'zustand';
+
+useStore : custom hook
+set : a function to updates the state
+state: current state
+
+const useStore = create((set) => ({
+  count: 0,
+  increase: () => set((state) => ({ count: state.count + 1 })),
+  reset: () => set({ count: 0 }),
+}));
+
+
+Usage :
+const count = useStore((state) => state.count);
+const increase = useStore((state) => state.increase);
+
+--------------------- Zustand Syntax for Your Project (Product Management):---------------------
+
+import { create } from 'zustand';
+
+const useProductStore = create((set) => ({
+  products: [],
+  addProduct: (product) =>
+    set((state) => ({
+      products: [...state.products, product],
+    })),
+  clearProducts: () => set({ products: [] }),
+}));
+
+Usage:
+
+const products = useProductStore((state) => state.products);
+const addProduct = useProductStore((state) => state.addProduct);

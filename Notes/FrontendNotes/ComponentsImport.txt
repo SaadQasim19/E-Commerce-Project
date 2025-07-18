@@ -1,0 +1,3 @@
+If a component is exported as **export default ComponentName** → ✅ import without {}.
+
+If a component is exported as **export const ComponentName = () => { ... }** → ✅ import with {}.

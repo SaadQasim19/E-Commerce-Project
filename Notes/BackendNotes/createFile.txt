@@ -1,0 +1,8 @@
+Creating file through terminal ---
+touch folder_name/file_name.extension
+
+┌──(sadoozii㉿sadoozii)-[~/Desktop/E-Commerce]
+└─$ touch Backend/server.js                         --- created
+
+Create a File in a New Folder (Automatically Creates Parent Folders)----
+mkdir -p folder_name && touch folder_name/file_name.extension

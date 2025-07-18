@@ -1,0 +1,6 @@
+1- go to postman . 
+2- create new blank workspace
+3- then create a new blank collection
+4- rename for ease 
+5- ... add new request 
+and continue working
