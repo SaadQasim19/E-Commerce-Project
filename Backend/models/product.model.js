@@ -15,6 +15,16 @@ const productSchema = new mongoose.Schema(
     image: {
       type: String,
       required: true,
+    },
+    category: {
+      type: String,
+      required: false,
+      default: 'Uncategorized'
+    },
+    description: {
+      type: String,
+      required: false,
+      default: ''
     }
   },{timestamps: true});   //& Mongoose will Automatically manage createdAt and updatedAt field
 

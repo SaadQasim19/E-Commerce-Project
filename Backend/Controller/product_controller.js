@@ -24,7 +24,11 @@ export const getProducts = async (req, res) => {
 //! POST PRODUCTS
 export const createProduct = async (req, res) => {
   const userProduct = req.body; //^ (body) data that we post on postman/client...
+  
+  console.log('📦 Create Product Request:', userProduct);
+  
   if (!userProduct.name || !userProduct.price || !userProduct.image) {
+    console.log('❌ Validation failed - Missing required fields');
     return res
       .status(400)
       .json({ success: false, message: "Required Fields are missing." });
@@ -33,6 +37,7 @@ export const createProduct = async (req, res) => {
   const newProduct = new productModel(userProduct);
   try {
     await newProduct.save();
+    console.log('✓ Product created successfully:', newProduct._id);
     res
       .status(201)
       .json({
@@ -41,8 +46,8 @@ export const createProduct = async (req, res) => {
         product: newProduct,
       });
   } catch (error) {
-    console.error("Error in creating product", error);
-    res.status(400).json({ success: false, message: "Internal Server Error" });
+    console.error("❌ Error in creating product:", error);
+    res.status(500).json({ success: false, message: error.message || "Internal Server Error" });
   }
 }
 

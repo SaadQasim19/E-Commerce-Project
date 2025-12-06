@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { API_ENDPOINTS } from '../config/api';
 
 const ProductStore = create((set) => ({
   oldProduct: [],
@@ -17,7 +18,10 @@ const ProductStore = create((set) => ({
     }
 
     try {
-      const res = await fetch("http://localhost:8000/api/products", {
+      console.log('Creating product:', newProduct);
+      console.log('Sending to:', API_ENDPOINTS.PRODUCTS);
+      
+      const res = await fetch(API_ENDPOINTS.PRODUCTS, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -25,24 +29,29 @@ const ProductStore = create((set) => ({
         body: JSON.stringify(newProduct)
       });
 
+      console.log('Response status:', res.status);
       const data = await res.json();
+      console.log('Response data:', data);
+
+      if (!res.ok || !data.success) {
+        return { success: false, message: data.message || "Failed to create product" };
+      }
 
       set((state) => ({
         oldProduct: [...state.oldProduct, data.product]
       }));
       
-
-      return { success: true, message: "Product created successfully" };
+      return { success: true, message: data.message || "Product created successfully" };
     } catch (error) {
-      console.error(error);
-      return { success: false, message: "Error creating product" };
+      console.error('Error creating product:', error);
+      return { success: false, message: error.message || "Network error - Cannot connect to server" };
     }
   },
 
   // Fetch products from API
   fetchProducts: async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/products");
+      const res = await fetch(API_ENDPOINTS.PRODUCTS);
       const data = await res.json();
 
       set({ oldProduct: data.products });
@@ -54,7 +63,7 @@ const ProductStore = create((set) => ({
   // Delete product
   deleteProducts: async (id) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/products/${id}`, {
+      const res = await fetch(API_ENDPOINTS.PRODUCT_BY_ID(id), {
         method: 'DELETE',
       });
 
@@ -74,7 +83,7 @@ const ProductStore = create((set) => ({
   },
   updateProducts: async (id, updateProduct) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/products/${id}`, {
+      const res = await fetch(API_ENDPOINTS.PRODUCT_BY_ID(id), {
         method: 'PUT',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateProduct)
