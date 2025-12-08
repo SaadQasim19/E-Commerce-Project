@@ -1,5 +1,6 @@
 import Order from "../models/order.model.js";
 import mongoose from "mongoose";
+import { createNotificationHelper } from "./notification_controller.js";
 
 // Create a new order
 export const createOrder = async (req, res) => {
@@ -29,6 +30,34 @@ export const createOrder = async (req, res) => {
   try {
     const newOrder = new Order(orderData);
     await newOrder.save();
+
+    // Create notification for the user
+    if (orderData.userId) {
+      await createNotificationHelper(
+        orderData.userId,
+        'order',
+        'Order Placed Successfully',
+        `Your order #${newOrder._id.toString().slice(-6)} has been placed and is being processed.`,
+        `/orders/${newOrder._id}`,
+        'shopping-cart',
+        'high'
+      );
+    }
+
+    // Notify admins about new order
+    const User = (await import('../models/user.model.js')).default;
+    const admins = await User.find({ role: 'admin' });
+    for (const admin of admins) {
+      await createNotificationHelper(
+        admin._id,
+        'order',
+        '🛍️ New Order Received',
+        `Order #${newOrder._id.toString().slice(-6)} placed for $${orderData.totalAmount.toFixed(2)}`,
+        `/admin/orders/${newOrder._id}`,
+        'shopping-bag',
+        'high'
+      );
+    }
 
     res.status(201).json({
       success: true,
@@ -128,6 +157,28 @@ export const updateOrderStatus = async (req, res) => {
         success: false,
         message: "Order not found",
       });
+    }
+
+    // Create notification for order status update
+    if (updatedOrder.userId) {
+      const statusMessages = {
+        processing: 'Your order is now being processed.',
+        shipped: 'Great news! Your order has been shipped.',
+        delivered: 'Your order has been delivered. Thank you for shopping with us!',
+        cancelled: 'Your order has been cancelled.',
+      };
+
+      const message = statusMessages[status] || `Your order status has been updated to ${status}.`;
+      
+      await createNotificationHelper(
+        updatedOrder.userId,
+        'order',
+        'Order Status Updated',
+        `Order #${updatedOrder._id.toString().slice(-6)}: ${message}`,
+        `/orders/${updatedOrder._id}`,
+        'package',
+        status === 'delivered' ? 'high' : 'medium'
+      );
     }
 
     res.status(200).json({

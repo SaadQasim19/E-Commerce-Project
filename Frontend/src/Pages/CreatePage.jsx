@@ -303,7 +303,7 @@ export default function CreatePage() {
                   ) : (
                     <Box
                       borderRadius="xl"
-                      border="2px dashed"
+                      border="2px solid"
                       borderColor="gray.300"
                       h="300px"
                       display="flex"
@@ -311,6 +311,7 @@ export default function CreatePage() {
                       justifyContent="center"
                       flexDirection="column"
                       gap={2}
+                      bg={useColorModeValue("gray.50", "gray.700")}
                     >
                       <Icon as={FiImage} boxSize={12} color="gray.400" />
                       <Text color="gray.500">Image preview will appear here</Text>

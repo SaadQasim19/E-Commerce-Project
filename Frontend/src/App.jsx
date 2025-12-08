@@ -6,6 +6,7 @@ import HomePage from "./Pages/HomePage";
 import ProductDetailPage from "./Pages/ProductDetailPage";
 import CheckoutPage from "./Pages/CheckoutPage";
 import OrderConfirmationPage from "./Pages/OrderConfirmationPage";
+import OrdersPage from "./Pages/OrdersPage";
 import ContactUs from "./Pages/ContactUs";
 import TrackOrder from "./Pages/TrackOrder";
 import ShippingInfo from "./Pages/ShippingInfo";
@@ -48,6 +49,7 @@ function App() {
                 <Route path="/create" element={<CreatePage />} />
                 <Route path="/product/:id" element={<ProductDetailPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/orders" element={<OrdersPage />} />
                 <Route path="/order-confirmation/:orderId" element={<OrderConfirmationPage />} />
                 
                 {/* Auth Routes */}

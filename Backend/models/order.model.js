@@ -5,8 +5,7 @@ const orderSchema = new mongoose.Schema(
     items: [
       {
         product: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
+          type: String, // Changed to String to handle both MongoDB _id and externalId
           required: true,
         },
         name: {
@@ -25,6 +24,11 @@ const orderSchema = new mongoose.Schema(
         image: {
           type: String,
           required: true,
+        },
+        source: {
+          type: String,
+          enum: ['manual', 'fakestore', 'dummyjson', 'platzi'],
+          default: 'manual',
         },
       },
     ],

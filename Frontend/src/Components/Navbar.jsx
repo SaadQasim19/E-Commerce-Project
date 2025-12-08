@@ -7,12 +7,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { PlusSquareIcon, BellIcon, SettingsIcon } from "@chakra-ui/icons";
 import { IoMoon } from "react-icons/io5";
 import { LuSun } from "react-icons/lu";
-import { MdDashboard, MdStorefront, MdFavorite } from "react-icons/md";
+import { MdDashboard, MdStorefront } from "react-icons/md";
 import { FiUser, FiSettings, FiLogOut, FiPackage, FiLogIn } from "react-icons/fi";
 import { motion } from "framer-motion";
 import CartIcon from "./CartIcon";
 import CartDrawer from "./CartDrawer";
+import WishlistIcon from "./WishlistIcon";
+import WishlistDrawer from "./WishlistDrawer";
 import useAuthStore from "../Store/auth";
+import useNotificationStore from "../Store/notification";
 import { useState, useEffect } from "react";
 import { getAvatarUrl } from "../utils/helpers";
 
@@ -21,12 +24,24 @@ const MotionBox = motion(Box);
 export default function Navbar() {
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isWishlistOpen, onOpen: onWishlistOpen, onClose: onWishlistClose } = useDisclosure();
   const navigate = useNavigate();
   const toast = useToast();
   const [scrolled, setScrolled] = useState(false);
 
   // Auth store
   const { user, isAuthenticated, logout, checkAuth } = useAuthStore();
+  
+  // Notification store
+  const { 
+    notifications, 
+    unreadCount, 
+    fetchNotifications, 
+    fetchUnreadCount,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification 
+  } = useNotificationStore();
 
   const bg = useColorModeValue("whiteAlpha.900", "gray.900");
   const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -36,6 +51,18 @@ export default function Navbar() {
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  // Fetch notifications when user is authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchNotifications();
+      // Poll for new notifications every 30 seconds
+      const interval = setInterval(() => {
+        fetchUnreadCount();
+      }, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, fetchNotifications, fetchUnreadCount]);
 
   // Handle scroll effect
   useEffect(() => {
@@ -137,45 +164,125 @@ export default function Navbar() {
                 </Link>
               </Tooltip>
 
-              {/* Wishlist */}
-              <Tooltip label="Wishlist" placement="bottom">
-                <IconButton
-                  icon={<MdFavorite size={20} />}
-                  aria-label="Wishlist"
-                  variant="ghost"
-                  colorScheme="pink"
-                  _hover={{ bg: hoverBg, transform: "translateY(-2px)" }}
-                  transition="all 0.2s"
-                />
-              </Tooltip>
-
               {/* Notifications */}
-              <Tooltip label="Notifications" placement="bottom">
-                <Box position="relative">
-                  <IconButton
-                    icon={<BellIcon fontSize={20} />}
-                    aria-label="Notifications"
-                    variant="ghost"
-                    colorScheme="orange"
-                    _hover={{ bg: hoverBg, transform: "translateY(-2px)" }}
-                    transition="all 0.2s"
-                  />
-                  <Badge
-                    position="absolute"
-                    top={-1}
-                    right={-1}
-                    colorScheme="red"
-                    borderRadius="full"
-                    boxSize="18px"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    fontSize="xs"
-                  >
-                    3
-                  </Badge>
-                </Box>
-              </Tooltip>
+              {isAuthenticated && (
+                <Menu>
+                  <Tooltip label="Notifications" placement="bottom">
+                    <MenuButton
+                      as={Box}
+                      position="relative"
+                      cursor="pointer"
+                    >
+                      <IconButton
+                        icon={<BellIcon fontSize={20} />}
+                        aria-label="Notifications"
+                        variant="ghost"
+                        colorScheme="orange"
+                        _hover={{ bg: hoverBg, transform: "translateY(-2px)" }}
+                        transition="all 0.2s"
+                      />
+                      {unreadCount > 0 && (
+                        <Badge
+                          position="absolute"
+                          top={-1}
+                          right={-1}
+                          colorScheme="red"
+                          borderRadius="full"
+                          minW="18px"
+                          h="18px"
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                          fontSize="xs"
+                          px={1}
+                        >
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </Badge>
+                      )}
+                    </MenuButton>
+                  </Tooltip>
+                  <MenuList maxH="400px" overflowY="auto" minW="320px">
+                    <Box p={3} borderBottomWidth="1px" borderColor={borderColor}>
+                      <Flex justify="space-between" align="center">
+                        <Text fontWeight="bold" fontSize="md">Notifications</Text>
+                        {unreadCount > 0 && (
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            colorScheme="blue"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              markAllAsRead();
+                            }}
+                          >
+                            Mark all read
+                          </Button>
+                        )}
+                      </Flex>
+                      {unreadCount > 0 && (
+                        <Text fontSize="xs" color="gray.500" mt={1}>
+                          {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
+                        </Text>
+                      )}
+                    </Box>
+                    {notifications.length === 0 ? (
+                      <Box p={6} textAlign="center">
+                        <BellIcon fontSize="3xl" color="gray.400" mb={2} />
+                        <Text color="gray.500" fontSize="sm">No notifications yet</Text>
+                      </Box>
+                    ) : (
+                      notifications.slice(0, 5).map((notification) => (
+                        <MenuItem
+                          key={notification._id}
+                          py={3}
+                          bg={!notification.isRead ? "blue.50" : "transparent"}
+                          _dark={{ bg: !notification.isRead ? "blue.900" : "transparent" }}
+                          _hover={{ bg: hoverBg }}
+                          onClick={() => {
+                            markAsRead(notification._id);
+                            if (notification.link) {
+                              navigate(notification.link);
+                            }
+                          }}
+                        >
+                          <Box w="full">
+                            <Flex justify="space-between" align="start">
+                              <Text fontSize="sm" fontWeight={!notification.isRead ? "bold" : "medium"}>
+                                {notification.title}
+                              </Text>
+                              {!notification.isRead && (
+                                <Badge colorScheme="blue" ml={2} flexShrink={0}>New</Badge>
+                              )}
+                            </Flex>
+                            <Text fontSize="xs" color="gray.600" _dark={{ color: "gray.400" }} mt={1}>
+                              {notification.message}
+                            </Text>
+                            <Text fontSize="xs" color="gray.500" mt={1}>
+                              {new Date(notification.createdAt).toLocaleString()}
+                            </Text>
+                          </Box>
+                        </MenuItem>
+                      ))
+                    )}
+                    {notifications.length > 5 && (
+                      <>
+                        <Divider />
+                        <MenuItem 
+                          justifyContent="center" 
+                          color="blue.500"
+                          fontWeight="medium"
+                          onClick={() => navigate('/notifications')}
+                        >
+                          View all notifications
+                        </MenuItem>
+                      </>
+                    )}
+                  </MenuList>
+                </Menu>
+              )}
+              
+              {/* Wishlist */}
+              <WishlistIcon onOpen={onWishlistOpen} />
               
               {/* Cart */}
               <CartIcon onOpen={onOpen} />
@@ -269,6 +376,9 @@ export default function Navbar() {
 
       {/* Cart Drawer */}
       <CartDrawer isOpen={isOpen} onClose={onClose} />
+      
+      {/* Wishlist Drawer */}
+      <WishlistDrawer isOpen={isWishlistOpen} onClose={onWishlistClose} />
     </>
   );
 }

@@ -26,7 +26,7 @@ const CartReview = () => {
       <VStack spacing={4} align="stretch">
         {items.map((item) => (
           <Box
-            key={item._id}
+            key={item._id || item.externalId || item.name}
             p={4}
             bg={bgColor}
             borderRadius="lg"

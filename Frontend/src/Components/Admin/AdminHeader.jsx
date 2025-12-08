@@ -27,7 +27,9 @@ import { MdLogout, MdPerson, MdStore, MdNotifications, MdSearch, MdSettings } fr
 import { FiMoon, FiSun, FiBell, FiSearch, FiHome } from "react-icons/fi";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import useAuthStore from "../../Store/auth";
+import useNotificationStore from "../../Store/notification";
 
 const MotionBox = motion.create(Box);
 
@@ -40,7 +42,29 @@ export default function AdminHeader() {
   const searchBg = useColorModeValue("gray.50", "gray.700");
 
   // Get user data from auth store
-  const { user, logout } = useAuthStore();
+  const { user, logout, isAuthenticated } = useAuthStore();
+  
+  // Notification store
+  const { 
+    notifications, 
+    unreadCount, 
+    fetchNotifications, 
+    fetchUnreadCount,
+    markAsRead,
+    markAllAsRead 
+  } = useNotificationStore();
+  
+  // Fetch notifications when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchNotifications();
+      // Poll for new notifications every 30 seconds
+      const interval = setInterval(() => {
+        fetchUnreadCount();
+      }, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, fetchNotifications, fetchUnreadCount]);
 
   // Get current page name from path
   const pathParts = location.pathname.split("/").filter(Boolean);
@@ -147,60 +171,105 @@ export default function AdminHeader() {
                   aria-label="Notifications"
                   fontSize="20px"
                 />
-                <MotionBox
-                  position="absolute"
-                  top={1}
-                  right={1}
-                  w={2.5}
-                  h={2.5}
-                  bg="red.500"
-                  borderRadius="full"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
+                {unreadCount > 0 && (
+                  <MotionBox
+                    position="absolute"
+                    top={1}
+                    right={1}
+                    minW="18px"
+                    h="18px"
+                    px={1}
+                    bg="red.500"
+                    color="white"
+                    borderRadius="full"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    fontSize="10px"
+                    fontWeight="bold"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </MotionBox>
+                )}
               </Box>
             </MenuButton>
-            <MenuList>
+            <MenuList maxH="400px" overflowY="auto" minW="320px">
               <Box p={3} borderBottom="1px" borderColor={borderColor}>
-                <Text fontWeight="bold">Notifications</Text>
-                <Text fontSize="xs" color="gray.500">
-                  You have 3 unread notifications
-                </Text>
+                <Flex justify="space-between" align="center">
+                  <Text fontWeight="bold">Notifications</Text>
+                  {unreadCount > 0 && (
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      colorScheme="cyan"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        markAllAsRead();
+                      }}
+                    >
+                      Mark all read
+                    </Button>
+                  )}
+                </Flex>
+                {unreadCount > 0 && (
+                  <Text fontSize="xs" color="gray.500" mt={1}>
+                    {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
+                  </Text>
+                )}
               </Box>
-              <MenuItem>
-                <VStack align="start" spacing={0}>
-                  <Text fontSize="sm" fontWeight="medium">
-                    New order received
-                  </Text>
-                  <Text fontSize="xs" color="gray.500">
-                    2 minutes ago
-                  </Text>
-                </VStack>
-              </MenuItem>
-              <MenuItem>
-                <VStack align="start" spacing={0}>
-                  <Text fontSize="sm" fontWeight="medium">
-                    Product stock low
-                  </Text>
-                  <Text fontSize="xs" color="gray.500">
-                    1 hour ago
-                  </Text>
-                </VStack>
-              </MenuItem>
-              <MenuItem>
-                <VStack align="start" spacing={0}>
-                  <Text fontSize="sm" fontWeight="medium">
-                    New customer registered
-                  </Text>
-                  <Text fontSize="xs" color="gray.500">
-                    3 hours ago
-                  </Text>
-                </VStack>
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem justifyContent="center" color="cyan.500">
-                View all notifications
-              </MenuItem>
+              {notifications.length === 0 ? (
+                <Box p={6} textAlign="center">
+                  <FiBell size={32} color="gray.400" style={{ margin: '0 auto 8px' }} />
+                  <Text color="gray.500" fontSize="sm">No notifications yet</Text>
+                </Box>
+              ) : (
+                notifications.slice(0, 5).map((notification) => (
+                  <MenuItem
+                    key={notification._id}
+                    py={3}
+                    bg={!notification.isRead ? "cyan.50" : "transparent"}
+                    _dark={{ bg: !notification.isRead ? "cyan.900" : "transparent" }}
+                    onClick={() => {
+                      markAsRead(notification._id);
+                      if (notification.link) {
+                        navigate(notification.link);
+                      }
+                    }}
+                  >
+                    <VStack align="start" spacing={1} w="full">
+                      <Flex justify="space-between" align="start" w="full">
+                        <Text fontSize="sm" fontWeight={!notification.isRead ? "bold" : "medium"}>
+                          {notification.title}
+                        </Text>
+                        {!notification.isRead && (
+                          <Badge colorScheme="cyan" ml={2} flexShrink={0}>New</Badge>
+                        )}
+                      </Flex>
+                      <Text fontSize="xs" color="gray.600" _dark={{ color: "gray.400" }}>
+                        {notification.message}
+                      </Text>
+                      <Text fontSize="xs" color="gray.500">
+                        {new Date(notification.createdAt).toLocaleString()}
+                      </Text>
+                    </VStack>
+                  </MenuItem>
+                ))
+              )}
+              {notifications.length > 5 && (
+                <>
+                  <MenuDivider />
+                  <MenuItem 
+                    justifyContent="center" 
+                    color="cyan.500"
+                    fontWeight="medium"
+                    onClick={() => navigate('/admin/notifications')}
+                  >
+                    View all notifications
+                  </MenuItem>
+                </>
+              )}
             </MenuList>
           </Menu>
 

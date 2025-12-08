@@ -98,11 +98,12 @@ const CheckoutPage = () => {
       // Prepare order data
       const orderData = {
         items: items.map((item) => ({
-          product: item._id,
+          product: item._id || item.externalId, // Handle both manual and external products
           name: item.name,
           price: item.price,
           quantity: item.quantity,
           image: item.image,
+          source: item.source || 'manual', // Include source field
         })),
         shippingInfo,
         paymentInfo: {
@@ -117,7 +118,7 @@ const CheckoutPage = () => {
       };
 
       // Send order to backend
-      const response = await fetch('http://localhost:8000/api/orders', {
+      const response = await fetch('http://localhost:5000/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

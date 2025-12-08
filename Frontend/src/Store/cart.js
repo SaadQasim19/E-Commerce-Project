@@ -99,7 +99,7 @@ const useCartStore = create(
         return get().cartItems.reduce(
           (total, item) => total + (item.price * item.quantity),
           0
-        ).toFixed(2);
+        );
       },
 
       // Check if item is in cart

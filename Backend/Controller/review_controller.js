@@ -1,6 +1,8 @@
 import Review from "../models/review.model.js";
 import Product from "../models/product.model.js";
+import User from "../models/user.model.js";
 import mongoose from "mongoose";
+import { createNotificationHelper } from "./notification_controller.js";
 
 // Create a new review
 export const createReview = async (req, res) => {
@@ -41,6 +43,20 @@ export const createReview = async (req, res) => {
     });
 
     await newReview.save();
+
+    // Notify all admins about new review
+    const admins = await User.find({ role: 'admin' });
+    for (const admin of admins) {
+      await createNotificationHelper(
+        admin._id,
+        'product',
+        'New Product Review 📝',
+        `${userName} left a ${rating}-star review for "${product.name}"`,
+        `/admin/reviews/${newReview._id}`,
+        'star',
+        'medium'
+      );
+    }
 
     res.status(201).json({
       success: true,

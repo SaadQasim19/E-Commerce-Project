@@ -1,7 +1,7 @@
 import productModel from "../models/product.model.js";
-
-
+import User from "../models/user.model.js";
 import mongoose from "mongoose";
+import { createNotificationHelper } from "./notification_controller.js";
 
 //! GET PRODUCTS
 export const getProducts = async (req, res) => {
@@ -71,6 +71,40 @@ export const updateProduct = async (req, res) => {
       userProduct,
       { new: true, runValidators: true }
     );
+
+    // Check for low stock and notify admins
+    const LOW_STOCK_THRESHOLD = 10;
+    if (updatedProduct.quantity <= LOW_STOCK_THRESHOLD && updatedProduct.quantity > 0) {
+      const admins = await User.find({ role: 'admin' });
+      for (const admin of admins) {
+        await createNotificationHelper(
+          admin._id,
+          'product',
+          '⚠️ Low Stock Alert',
+          `Product "${updatedProduct.name}" has only ${updatedProduct.quantity} items left in stock!`,
+          `/admin/products/${updatedProduct._id}`,
+          'alert-triangle',
+          'high'
+        );
+      }
+    }
+
+    // Out of stock notification
+    if (updatedProduct.quantity === 0) {
+      const admins = await User.find({ role: 'admin' });
+      for (const admin of admins) {
+        await createNotificationHelper(
+          admin._id,
+          'product',
+          '🚨 Out of Stock',
+          `Product "${updatedProduct.name}" is now out of stock!`,
+          `/admin/products/${updatedProduct._id}`,
+          'x-circle',
+          'high'
+        );
+      }
+    }
+
     res
       .status(200)
       .json({

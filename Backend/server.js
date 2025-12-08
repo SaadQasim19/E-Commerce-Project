@@ -28,6 +28,9 @@ import authRoutes from "./Routes/auth_routes.js";
 import socialAuthRoutes from "./Routes/social_auth_routes.js";
 import settingsRoutes from "./Routes/settings_routes.js";
 import uploadRoutes from "./Routes/upload_routes.js";
+import notificationRoutes from "./Routes/notification_routes.js";
+import promotionRoutes from "./Routes/promotion_routes.js";
+import externalProductRoutes from "./Routes/externalProduct_routes.js";
 
 const app = express();
 app.use(cors({
@@ -73,6 +76,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/auth", socialAuthRoutes); // Social OAuth routes (Google, Facebook, GitHub)
 app.use("/api/settings", settingsRoutes); // Admin settings routes
 app.use("/api/users", uploadRoutes); // User profile & avatar upload routes
+app.use("/api/notifications", notificationRoutes); // Notification routes
+app.use("/api/promotions", promotionRoutes); // Promotional notification routes (Admin only)
+app.use("/api/external-products", externalProductRoutes); // External product API routes
 
 
 

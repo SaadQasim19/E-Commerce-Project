@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { createNotificationHelper } from "./notification_controller.js";
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -70,6 +71,31 @@ export const signup = async (req, res) => {
       email,
       password, // Will be hashed by pre-save middleware
     });
+
+    // Create welcome notification for user
+    await createNotificationHelper(
+      user._id,
+      'system',
+      'Welcome to ShopHub! 🎉',
+      'Thank you for joining us! Start exploring our amazing products and enjoy exclusive deals.',
+      '/',
+      'bell',
+      'high'
+    );
+
+    // Notify admins about new user registration
+    const admins = await User.find({ role: 'admin' });
+    for (const admin of admins) {
+      await createNotificationHelper(
+        admin._id,
+        'user',
+        '👤 New User Registered',
+        `${user.name} (${user.email}) just joined ShopHub!`,
+        '/admin/users',
+        'user-plus',
+        'medium'
+      );
+    }
 
     // Send token response
     sendTokenResponse(user, 201, res, "User registered successfully");
@@ -209,6 +235,19 @@ export const updateProfile = async (req, res) => {
       }
     );
 
+    // Send profile update notification (only for significant changes)
+    if (name || avatar) {
+      await createNotificationHelper(
+        user._id,
+        'user',
+        '✅ Profile Updated',
+        'Your profile information has been successfully updated.',
+        '/profile',
+        'user',
+        'low'
+      );
+    }
+
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",
@@ -253,6 +292,17 @@ export const updatePassword = async (req, res) => {
     // Update password
     user.password = newPassword;
     await user.save();
+
+    // Send security notification
+    await createNotificationHelper(
+      user._id,
+      'user',
+      '🔒 Password Changed',
+      'Your password was successfully changed. If this wasn\'t you, please contact support immediately.',
+      '/profile',
+      'shield',
+      'high'
+    );
 
     // Send token response
     sendTokenResponse(user, 200, res, "Password updated successfully");

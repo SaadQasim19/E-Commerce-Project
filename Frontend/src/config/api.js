@@ -28,6 +28,17 @@ export const API_ENDPOINTS = {
   
   // Settings
   SETTINGS: `${API_BASE_URL}/api/settings`,
+  
+  // Notifications
+  NOTIFICATIONS: `${API_BASE_URL}/api/notifications`,
+  UNREAD_COUNT: `${API_BASE_URL}/api/notifications/unread-count`,
+  MARK_AS_READ: (id) => `${API_BASE_URL}/api/notifications/${id}/read`,
+  MARK_ALL_READ: `${API_BASE_URL}/api/notifications/mark-all-read`,
+  DELETE_NOTIFICATION: (id) => `${API_BASE_URL}/api/notifications/${id}`,
+  CLEAR_READ: `${API_BASE_URL}/api/notifications/clear-read/all`,
+  
+  // External Products (API Integration)
+  EXTERNAL_PRODUCTS: `${API_BASE_URL}/api/external-products`,
 };
 
 export default API_BASE_URL;

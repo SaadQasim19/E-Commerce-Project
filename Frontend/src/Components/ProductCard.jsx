@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import ProductStore from "../Store/product";
 import useCartStore from "../Store/cart";
+import useWishlistStore from "../Store/wishlist";
 import StarRating from "./StarRating";
 
 const MotionBox = motion(Box);
@@ -29,6 +30,9 @@ const ProductCard = ({ product }) => {
   
   // Get cart functions
   const { addToCart, isInCart } = useCartStore();
+  
+  // Get wishlist functions
+  const { toggleWishlist, isInWishlist } = useWishlistStore();
 
   // Fetch review stats for this product
   useEffect(() => {
@@ -176,6 +180,18 @@ const ProductCard = ({ product }) => {
     });
   };
 
+  const handleToggleWishlist = () => {
+    const result = toggleWishlist(product);
+    toast({
+      title: result.success ? "Success" : "Info",
+      description: result.message,
+      status: result.success ? "success" : "info",
+      duration: 2000,
+      isClosable: true,
+      position: "bottom-right",
+    });
+  };
+
   const [isHovered, setIsHovered] = useState(false);
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -246,17 +262,18 @@ const ProductCard = ({ product }) => {
 
         {/* Favorite Icon */}
         <Box position="absolute" top={3} right={3} zIndex={2}>
-          <Tooltip label="Add to Wishlist" placement="left">
+          <Tooltip label={isInWishlist(product._id || product.externalId) ? "Remove from Wishlist" : "Add to Wishlist"} placement="left">
             <IconButton
-              icon={<FiHeart />}
+              icon={isInWishlist(product._id || product.externalId) ? <FiHeart fill="currentColor" /> : <FiHeart />}
               size="sm"
-              colorScheme="pink"
+              colorScheme={isInWishlist(product._id || product.externalId) ? "red" : "pink"}
               variant="solid"
               borderRadius="full"
               opacity={isHovered ? 1 : 0}
               transform={isHovered ? "scale(1)" : "scale(0.8)"}
               transition="all 0.3s"
-              aria-label="Add to wishlist"
+              aria-label={isInWishlist(product._id || product.externalId) ? "Remove from wishlist" : "Add to wishlist"}
+              onClick={handleToggleWishlist}
             />
           </Tooltip>
         </Box>
@@ -288,14 +305,19 @@ const ProductCard = ({ product }) => {
             transition="transform 0.3s"
           >
             <HStack spacing={2} justify="center">
-              <Tooltip label="Quick View">
+              <Tooltip label="Quick View" placement="top">
                 <IconButton
                   icon={<FiEye />}
                   size="sm"
-                  colorScheme="whiteAlpha"
+                  bg="white"
+                  color="pink.500"
+                  _hover={{ bg: "pink.50", color: "pink.600", transform: "scale(1.1)" }}
+                  _dark={{ bg: "gray.700", color: "pink.400", _hover: { bg: "gray.600" } }}
                   variant="solid"
                   onClick={() => navigate(`/product/${product._id}`)}
                   aria-label="Quick view"
+                  boxShadow="md"
+                  transition="all 0.2s"
                 />
               </Tooltip>
               <Button

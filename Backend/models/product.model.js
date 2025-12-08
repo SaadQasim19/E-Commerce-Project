@@ -25,6 +25,41 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: false,
       default: ''
+    },
+    quantity: {
+      type: Number,
+      required: false,
+      default: 0
+    },
+    source: {
+      type: String,
+      enum: ['manual', 'fakestore', 'dummyjson', 'platzi', 'api'],
+      default: 'manual'
+    },
+    externalId: {
+      type: String,
+      required: false,
+      unique: true,
+      sparse: true  // Allows null/undefined values to not be unique
+    },
+    brand: {
+      type: String,
+      required: false,
+      default: 'Generic'
+    },
+    rating: {
+      type: Number,
+      required: false,
+      default: 0,
+      min: 0,
+      max: 5
+    },
+    discount: {
+      type: Number,
+      required: false,
+      default: 0,
+      min: 0,
+      max: 100
     }
   },{timestamps: true});   //& Mongoose will Automatically manage createdAt and updatedAt field
 
