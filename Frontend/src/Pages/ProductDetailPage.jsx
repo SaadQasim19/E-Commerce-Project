@@ -44,6 +44,9 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [reviewRefresh, setReviewRefresh] = useState(0);
 
+  // Check if user is authenticated as admin
+  const isAdminAuthenticated = localStorage.getItem("adminAuthenticated") === "true";
+
   const bg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
 
@@ -253,61 +256,79 @@ export default function ProductDetailPage() {
 
             <Divider />
 
-            {/* Quantity Selector */}
-            <Box>
-              <Text fontWeight="semibold" mb={3}>
-                Quantity
-              </Text>
-              <HStack spacing={4}>
-                <HStack>
-                  <IconButton
-                    icon={<FiMinus />}
-                    onClick={decreaseQuantity}
-                    size="md"
-                    variant="outline"
-                    aria-label="Decrease quantity"
-                  />
-                  <Text
-                    fontSize="xl"
-                    fontWeight="bold"
-                    minW="60px"
-                    textAlign="center"
-                    px={4}
-                    py={2}
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    borderRadius="md"
-                  >
-                    {quantity}
-                  </Text>
-                  <IconButton
-                    icon={<FiPlus />}
-                    onClick={increaseQuantity}
-                    size="md"
-                    variant="outline"
-                    aria-label="Increase quantity"
-                  />
-                </HStack>
-                <Text color={useColorModeValue("gray.600", "gray.400")}>
-                  Subtotal: <Text as="span" fontWeight="bold" color="green.500">
-                    ${(product.price * quantity).toFixed(2)}
-                  </Text>
+            {/* Quantity Selector - Hidden for Admin */}
+            {!isAdminAuthenticated && (
+              <Box>
+                <Text fontWeight="semibold" mb={3}>
+                  Quantity
                 </Text>
-              </HStack>
-            </Box>
+                <HStack spacing={4}>
+                  <HStack>
+                    <IconButton
+                      icon={<FiMinus />}
+                      onClick={decreaseQuantity}
+                      size="md"
+                      variant="outline"
+                      aria-label="Decrease quantity"
+                    />
+                    <Text
+                      fontSize="xl"
+                      fontWeight="bold"
+                      minW="60px"
+                      textAlign="center"
+                      px={4}
+                      py={2}
+                      borderWidth="1px"
+                      borderColor={borderColor}
+                      borderRadius="md"
+                    >
+                      {quantity}
+                    </Text>
+                    <IconButton
+                      icon={<FiPlus />}
+                      onClick={increaseQuantity}
+                      size="md"
+                      variant="outline"
+                      aria-label="Increase quantity"
+                    />
+                  </HStack>
+                  <Text color={useColorModeValue("gray.600", "gray.400")}>
+                    Subtotal: <Text as="span" fontWeight="bold" color="green.500">
+                      ${(product.price * quantity).toFixed(2)}
+                    </Text>
+                  </Text>
+                </HStack>
+              </Box>
+            )}
 
-            {/* Add to Cart Button */}
-            <Button
-              leftIcon={<FiShoppingCart />}
-              colorScheme={isInCart(product._id) ? "green" : "blue"}
-              size="lg"
-              fontSize="md"
-              onClick={handleAddToCart}
-              w="full"
-              py={6}
-            >
-              {isInCart(product._id) ? "Update Cart" : "Add to Cart"}
-            </Button>
+            {/* Add to Cart Button - Hidden for Admin */}
+            {!isAdminAuthenticated && (
+              <Button
+                leftIcon={<FiShoppingCart />}
+                colorScheme={isInCart(product._id) ? "green" : "blue"}
+                size="lg"
+                fontSize="md"
+                onClick={handleAddToCart}
+                w="full"
+                py={6}
+              >
+                {isInCart(product._id) ? "Update Cart" : "Add to Cart"}
+              </Button>
+            )}
+            
+            {/* Admin Notice */}
+            {isAdminAuthenticated && (
+              <Box
+                p={4}
+                bg={useColorModeValue("blue.50", "blue.900")}
+                borderRadius="md"
+                textAlign="center"
+              >
+                <Text color={useColorModeValue("blue.700", "blue.200")} fontWeight="medium">
+                  👨‍💼 Admin View Mode - Cart features disabled
+                </Text>
+              </Box>
+            )}
           </VStack>
         </GridItem>
       </Grid>

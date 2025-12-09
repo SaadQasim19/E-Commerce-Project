@@ -31,6 +31,7 @@ import AdminAnalytics from "./Pages/Admin/AdminAnalytics";
 import AdminSettings from "./Pages/Admin/AdminSettings";
 import AdminProfile from "./Pages/Admin/AdminProfile";
 import UserProfile from "./Pages/UserProfile";
+import AdminProtectedRoute from "./Components/AdminProtectedRoute";
 import { Routes, Route } from "react-router-dom";
 
 function App() {
@@ -81,8 +82,8 @@ function App() {
         }
       />
 
-      {/* Admin Routes */}
-      <Route path="/admin" element={<AdminLayout />}>
+      {/* Admin Routes - Protected */}
+      <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
         <Route index element={<AdminDashboard />} />
         <Route path="products" element={<AdminProducts />} />
         <Route path="orders" element={<AdminOrders />} />

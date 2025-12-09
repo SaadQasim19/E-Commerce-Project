@@ -3,7 +3,7 @@ import {
   IconButton, Box, Badge, useColorModeValue, Tooltip, Menu,
   MenuButton, MenuList, MenuItem, Avatar, Divider, useToast
 } from "@chakra-ui/react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { PlusSquareIcon, BellIcon, SettingsIcon } from "@chakra-ui/icons";
 import { IoMoon } from "react-icons/io5";
 import { LuSun } from "react-icons/lu";
@@ -26,8 +26,12 @@ export default function Navbar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isWishlistOpen, onOpen: onWishlistOpen, onClose: onWishlistClose } = useDisclosure();
   const navigate = useNavigate();
+  const location = useLocation();
   const toast = useToast();
   const [scrolled, setScrolled] = useState(false);
+
+  // Check if user is authenticated as admin
+  const isAdminAuthenticated = localStorage.getItem("adminAuthenticated") === "true";
 
   // Auth store
   const { user, isAuthenticated, logout, checkAuth } = useAuthStore();
@@ -281,11 +285,11 @@ export default function Navbar() {
                 </Menu>
               )}
               
-              {/* Wishlist */}
-              <WishlistIcon onOpen={onWishlistOpen} />
+              {/* Wishlist - Hidden for Admin */}
+              {!isAdminAuthenticated && <WishlistIcon onOpen={onWishlistOpen} />}
               
-              {/* Cart */}
-              <CartIcon onOpen={onOpen} />
+              {/* Cart - Hidden for Admin */}
+              {!isAdminAuthenticated && <CartIcon onOpen={onOpen} />}
               
               {/* Color Mode Toggle */}
               <Tooltip label={colorMode === "light" ? "Dark Mode" : "Light Mode"} placement="bottom">

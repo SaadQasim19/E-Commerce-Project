@@ -25,6 +25,9 @@ const ProductCard = ({ product }) => {
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  // Check if user is authenticated as admin
+  const isAdminAuthenticated = localStorage.getItem("adminAuthenticated") === "true";
+
   // Get both the functions and the products array
   const { deleteProducts, updateProducts, oldProduct } = ProductStore();
   
@@ -260,23 +263,25 @@ const ProductCard = ({ product }) => {
           </VStack>
         </Box>
 
-        {/* Favorite Icon */}
-        <Box position="absolute" top={3} right={3} zIndex={2}>
-          <Tooltip label={isInWishlist(product._id || product.externalId) ? "Remove from Wishlist" : "Add to Wishlist"} placement="left">
-            <IconButton
-              icon={isInWishlist(product._id || product.externalId) ? <FiHeart fill="currentColor" /> : <FiHeart />}
-              size="sm"
-              colorScheme={isInWishlist(product._id || product.externalId) ? "red" : "pink"}
-              variant="solid"
-              borderRadius="full"
-              opacity={isHovered ? 1 : 0}
-              transform={isHovered ? "scale(1)" : "scale(0.8)"}
-              transition="all 0.3s"
-              aria-label={isInWishlist(product._id || product.externalId) ? "Remove from wishlist" : "Add to wishlist"}
-              onClick={handleToggleWishlist}
-            />
-          </Tooltip>
-        </Box>
+        {/* Favorite Icon - Hidden for Admin */}
+        {!isAdminAuthenticated && (
+          <Box position="absolute" top={3} right={3} zIndex={2}>
+            <Tooltip label={isInWishlist(product._id || product.externalId) ? "Remove from Wishlist" : "Add to Wishlist"} placement="left">
+              <IconButton
+                icon={isInWishlist(product._id || product.externalId) ? <FiHeart fill="currentColor" /> : <FiHeart />}
+                size="sm"
+                colorScheme={isInWishlist(product._id || product.externalId) ? "red" : "pink"}
+                variant="solid"
+                borderRadius="full"
+                opacity={isHovered ? 1 : 0}
+                transform={isHovered ? "scale(1)" : "scale(0.8)"}
+                transition="all 0.3s"
+                aria-label={isInWishlist(product._id || product.externalId) ? "Remove from wishlist" : "Add to wishlist"}
+                onClick={handleToggleWishlist}
+              />
+            </Tooltip>
+          </Box>
+        )}
 
         {/* Product Image with Zoom Effect */}
         <Image 
@@ -320,15 +325,18 @@ const ProductCard = ({ product }) => {
                   transition="all 0.2s"
                 />
               </Tooltip>
-              <Button
-                leftIcon={<FiShoppingCart />}
-                size="sm"
-                colorScheme={isInCart(product._id) ? "green" : "cyan"}
-                flex={1}
-                onClick={handleAddToCart}
-              >
-                {isInCart(product._id) ? "In Cart" : "Add to Cart"}
-              </Button>
+              {/* Add to Cart Button - Hidden for Admin */}
+              {!isAdminAuthenticated && (
+                <Button
+                  leftIcon={<FiShoppingCart />}
+                  size="sm"
+                  colorScheme={isInCart(product._id) ? "green" : "cyan"}
+                  flex={1}
+                  onClick={handleAddToCart}
+                >
+                  {isInCart(product._id) ? "In Cart" : "Add to Cart"}
+                </Button>
+              )}
             </HStack>
           </Box>
         </ScaleFade>
