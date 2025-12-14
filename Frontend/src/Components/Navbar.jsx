@@ -31,7 +31,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
   // Check if user is authenticated as admin
-  const isAdminAuthenticated = localStorage.getItem("adminAuthenticated") === "true";
+  const isAdminAuthenticated = sessionStorage.getItem("adminAuthenticated") === "true";
 
   // Auth store
   const { user, isAuthenticated, logout, checkAuth } = useAuthStore();
@@ -47,9 +47,9 @@ export default function Navbar() {
     deleteNotification 
   } = useNotificationStore();
 
-  const bg = useColorModeValue("whiteAlpha.900", "gray.900");
+  const bg = useColorModeValue("white", "gray.900");
   const borderColor = useColorModeValue("gray.200", "gray.700");
-  const hoverBg = useColorModeValue("gray.100", "gray.700");
+  const hoverBg = useColorModeValue("gray.50", "gray.700");
 
   // Check authentication on mount
   useEffect(() => {
@@ -98,12 +98,12 @@ export default function Navbar() {
         position="sticky"
         top={0}
         zIndex={1000}
-        bg={scrolled ? bg : "transparent"}
-        backdropFilter={scrolled ? "blur(10px)" : "none"}
-        borderBottom={scrolled ? "1px" : "0"}
+        bg={bg}
+        backdropFilter="blur(10px)"
+        borderBottom="1px"
         borderColor={borderColor}
         transition="all 0.3s"
-        boxShadow={scrolled ? "md" : "none"}
+        boxShadow={useColorModeValue("sm", "md")}
       >
         <Container maxW={"1140px"} px={4}>
           <Flex

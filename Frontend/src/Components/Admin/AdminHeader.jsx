@@ -74,7 +74,7 @@ export default function AdminHeader() {
   // Handle logout
   const handleLogout = async () => {
     // Clear admin authentication
-    localStorage.removeItem("adminAuthenticated");
+    sessionStorage.removeItem("adminAuthenticated");
     await logout();
     navigate('/');
   };

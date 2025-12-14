@@ -107,10 +107,23 @@ const OrderSummary = ({ shippingInfo, paymentInfo, items, subtotal }) => {
                   </Badge>
                 </>
               )}
+              {paymentInfo.paymentMethod === 'cod' && (
+                <>
+                  <Text fontSize="xl">💵</Text>
+                  <Badge colorScheme="orange" fontSize="md" px={3} py={1}>
+                    Cash on Delivery
+                  </Badge>
+                </>
+              )}
             </HStack>
             {paymentInfo.paymentMethod === 'card' && paymentInfo.cardNumber && (
               <Text fontSize="sm" color="gray.600">
                 **** **** **** {paymentInfo.cardNumber.replace(/\s/g, '').slice(-4)}
+              </Text>
+            )}
+            {paymentInfo.paymentMethod === 'cod' && (
+              <Text fontSize="sm" color="orange.600" fontWeight="medium">
+                Pay when you receive your order
               </Text>
             )}
           </VStack>

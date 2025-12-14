@@ -42,7 +42,7 @@ function App() {
       <Route
         path="/*"
         element={
-          <Box minH={"100vh"} bg={useColorModeValue("green.900", "gray.900")} display="flex" flexDirection="column">
+          <Box minH={"100vh"} bg={useColorModeValue("gray.50", "gray.900")} display="flex" flexDirection="column">
             <Navbar />
             <Box flex="1">
               <Routes>

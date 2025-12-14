@@ -177,12 +177,19 @@ const CheckoutPage = () => {
           shippingInfo.country
         );
       case 2:
-        return (
-          paymentInfo.cardNumber.length === 16 &&
-          paymentInfo.cardName &&
-          paymentInfo.expiryDate &&
-          paymentInfo.cvv.length === 3
-        );
+        // If payment method is card, validate card fields
+        if (paymentInfo.paymentMethod === 'card') {
+          const cardNumberDigits = paymentInfo.cardNumber.replace(/\s/g, '');
+          return (
+            cardNumberDigits.length === 16 &&
+            paymentInfo.cardName &&
+            paymentInfo.expiryDate &&
+            paymentInfo.expiryDate.length === 5 &&
+            paymentInfo.cvv.length === 3
+          );
+        }
+        // For other payment methods (PayPal, COD), just return true
+        return true;
       case 3:
         return true;
       default:

@@ -26,7 +26,7 @@ const ProductCard = ({ product }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // Check if user is authenticated as admin
-  const isAdminAuthenticated = localStorage.getItem("adminAuthenticated") === "true";
+  const isAdminAuthenticated = sessionStorage.getItem("adminAuthenticated") === "true";
 
   // Get both the functions and the products array
   const { deleteProducts, updateProducts, oldProduct } = ProductStore();

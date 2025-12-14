@@ -45,7 +45,7 @@ export default function ProductDetailPage() {
   const [reviewRefresh, setReviewRefresh] = useState(0);
 
   // Check if user is authenticated as admin
-  const isAdminAuthenticated = localStorage.getItem("adminAuthenticated") === "true";
+  const isAdminAuthenticated = sessionStorage.getItem("adminAuthenticated") === "true";
 
   const bg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");

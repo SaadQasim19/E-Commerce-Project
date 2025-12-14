@@ -32,8 +32,11 @@ const AdminProtectedRoute = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already authenticated
-    const adminAuth = localStorage.getItem("adminAuthenticated");
+    // Clean up old localStorage authentication (migration to sessionStorage)
+    localStorage.removeItem("adminAuthenticated");
+    
+    // Check if user is already authenticated in this session
+    const adminAuth = sessionStorage.getItem("adminAuthenticated");
     if (adminAuth === "true") {
       setIsAuthenticated(true);
     }
@@ -42,7 +45,7 @@ const AdminProtectedRoute = ({ children }) => {
 
   const handleLogin = () => {
     if (password === ADMIN_PASSWORD) {
-      localStorage.setItem("adminAuthenticated", "true");
+      sessionStorage.setItem("adminAuthenticated", "true");
       setIsAuthenticated(true);
       setPassword("");
       toast({

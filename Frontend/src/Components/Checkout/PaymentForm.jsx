@@ -210,6 +210,25 @@ const PaymentForm = ({ paymentInfo, setPaymentInfo }) => {
                   </Radio>
                 </Box>
               </HStack>
+
+              <Box
+                p={4}
+                borderRadius="md"
+                borderWidth="2px"
+                borderColor={
+                  paymentInfo.paymentMethod === 'cod' ? 'cyan.500' : 'gray.200'
+                }
+                cursor="pointer"
+                transition="all 0.2s"
+                _hover={{ borderColor: 'cyan.400' }}
+              >
+                <Radio value="cod" colorScheme="cyan">
+                  <HStack>
+                    <Text fontSize="xl">💵</Text>
+                    <Text fontWeight="medium">Cash on Delivery</Text>
+                  </HStack>
+                </Radio>
+              </Box>
             </VStack>
           </RadioGroup>
         </FormControl>
@@ -274,7 +293,15 @@ const PaymentForm = ({ paymentInfo, setPaymentInfo }) => {
           </VStack>
         )}
 
-        {paymentInfo.paymentMethod !== 'card' && (
+        {paymentInfo.paymentMethod === 'cod' && (
+          <Box p={4} bg="green.50" borderRadius="md" w="100%" _dark={{ bg: 'green.900' }}>
+            <Text fontSize="sm" color="green.700" _dark={{ color: 'green.200' }}>
+              💵 Pay with cash when your order is delivered. No advance payment needed!
+            </Text>
+          </Box>
+        )}
+
+        {paymentInfo.paymentMethod !== 'card' && paymentInfo.paymentMethod !== 'cod' && (
           <Box p={4} bg="blue.50" borderRadius="md" w="100%" _dark={{ bg: 'blue.900' }}>
             <Text fontSize="sm" color="blue.700" _dark={{ color: 'blue.200' }}>
               🔒 You'll be redirected to {paymentInfo.paymentMethod.toUpperCase()} to complete

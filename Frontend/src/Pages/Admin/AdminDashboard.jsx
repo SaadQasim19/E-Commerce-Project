@@ -61,6 +61,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  ComposedChart,
 } from "recharts";
 import ProductStore from "../../Store/product";
 
@@ -298,7 +299,7 @@ export default function AdminDashboard() {
 
       {/* Charts Section */}
       <Grid templateColumns={{ base: "1fr", lg: "2fr 1fr" }} gap={6} mb={8}>
-        {/* Revenue Chart */}
+        {/* Revenue Chart - Professional E-Commerce Style */}
         <GridItem>
           <MotionBox
             initial={{ opacity: 0, x: -20 }}
@@ -313,7 +314,7 @@ export default function AdminDashboard() {
               borderWidth="1px"
               borderColor={borderColor}
             >
-              <Flex justify="space-between" align="center" mb={6}>
+              <Flex justify="space-between" align="center" mb={2}>
                 <Box>
                   <Heading size="md" mb={1}>
                     Revenue Overview
@@ -322,38 +323,168 @@ export default function AdminDashboard() {
                     Monthly revenue and orders trend
                   </Text>
                 </Box>
-                <Badge colorScheme="green" fontSize="md" px={3} py={1} borderRadius="full">
-                  +15.3%
-                </Badge>
+                <HStack spacing={2}>
+                  <Menu>
+                    <MenuButton
+                      as={IconButton}
+                      icon={<MdMoreVert />}
+                      variant="ghost"
+                      size="sm"
+                      aria-label="Options"
+                    />
+                    <MenuList>
+                      <MenuItem>Last 30 Days</MenuItem>
+                      <MenuItem>Last 3 Months</MenuItem>
+                      <MenuItem>Last 6 Months</MenuItem>
+                      <MenuItem>Last Year</MenuItem>
+                    </MenuList>
+                  </Menu>
+                </HStack>
               </Flex>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={revenueData}>
+
+              {/* Summary Stats Row */}
+              <HStack spacing={6} mb={6} mt={4}>
+                <Box>
+                  <Text fontSize="xs" color="gray.500" fontWeight="600" textTransform="uppercase">
+                    Total Revenue
+                  </Text>
+                  <HStack spacing={2} align="baseline">
+                    <Text fontSize="2xl" fontWeight="bold" color="blue.500">
+                      ${revenueData.reduce((sum, item) => sum + item.revenue, 0).toLocaleString()}
+                    </Text>
+                    <Badge colorScheme="green" fontSize="xs">
+                      <HStack spacing={1}>
+                        <Icon as={MdArrowUpward} boxSize={3} />
+                        <Text>15.3%</Text>
+                      </HStack>
+                    </Badge>
+                  </HStack>
+                </Box>
+                <Box>
+                  <Text fontSize="xs" color="gray.500" fontWeight="600" textTransform="uppercase">
+                    Total Orders
+                  </Text>
+                  <HStack spacing={2} align="baseline">
+                    <Text fontSize="2xl" fontWeight="bold" color="purple.500">
+                      {revenueData.reduce((sum, item) => sum + item.orders, 0)}
+                    </Text>
+                    <Badge colorScheme="green" fontSize="xs">
+                      <HStack spacing={1}>
+                        <Icon as={MdArrowUpward} boxSize={3} />
+                        <Text>8.2%</Text>
+                      </HStack>
+                    </Badge>
+                  </HStack>
+                </Box>
+                <Box>
+                  <Text fontSize="xs" color="gray.500" fontWeight="600" textTransform="uppercase">
+                    Avg Order Value
+                  </Text>
+                  <Text fontSize="2xl" fontWeight="bold" color="green.500">
+                    ${(revenueData.reduce((sum, item) => sum + item.revenue, 0) / revenueData.reduce((sum, item) => sum + item.orders, 0)).toFixed(2)}
+                  </Text>
+                </Box>
+              </HStack>
+
+              {/* Professional Combo Chart */}
+              <ResponsiveContainer width="100%" height={320}>
+                <ComposedChart 
+                  data={revenueData}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
                   <defs>
-                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.9} />
+                      <stop offset="100%" stopColor="#60A5FA" stopOpacity={0.7} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-                  <XAxis dataKey="month" />
-                  <YAxis />
+                  <CartesianGrid 
+                    strokeDasharray="3 3" 
+                    stroke={useColorModeValue("#E5E7EB", "#374151")} 
+                    vertical={false}
+                  />
+                  <XAxis 
+                    dataKey="month" 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: useColorModeValue("#6B7280", "#9CA3AF"), fontSize: 12 }}
+                    dy={10}
+                  />
+                  <YAxis 
+                    yAxisId="revenue"
+                    orientation="left"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: useColorModeValue("#6B7280", "#9CA3AF"), fontSize: 12 }}
+                    tickFormatter={(value) => `$${(value / 1000).toFixed(1)}k`}
+                  />
+                  <YAxis 
+                    yAxisId="orders"
+                    orientation="right"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: useColorModeValue("#6B7280", "#9CA3AF"), fontSize: 12 }}
+                  />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: useColorModeValue("white", "gray.800"),
-                      borderRadius: "8px",
-                      border: "none",
-                      boxShadow: "lg",
+                      backgroundColor: useColorModeValue("white", "#1F2937"),
+                      border: `1px solid ${useColorModeValue("#E5E7EB", "#374151")}`,
+                      borderRadius: "12px",
+                      boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+                      padding: "12px",
+                    }}
+                    labelStyle={{
+                      color: useColorModeValue("#111827", "#F9FAFB"),
+                      fontWeight: "600",
+                      marginBottom: "8px",
+                    }}
+                    formatter={(value, name) => {
+                      if (name === "revenue") return [`$${value.toLocaleString()}`, "Revenue"];
+                      if (name === "orders") return [value, "Orders"];
+                      return [value, name];
+                    }}
+                    cursor={{ fill: useColorModeValue("#F3F4F6", "#374151"), opacity: 0.3 }}
+                  />
+                  <Legend 
+                    wrapperStyle={{ 
+                      paddingTop: "20px",
+                      fontSize: "13px",
+                      fontWeight: "500"
+                    }}
+                    iconType="circle"
+                    formatter={(value) => {
+                      if (value === "revenue") return "Revenue ($)";
+                      if (value === "orders") return "Orders (count)";
+                      return value;
                     }}
                   />
-                  <Area
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke="#3B82F6"
-                    fillOpacity={1}
-                    fill="url(#colorRevenue)"
-                    strokeWidth={3}
+                  <Bar 
+                    yAxisId="revenue"
+                    dataKey="revenue" 
+                    fill="url(#barGradient)"
+                    radius={[8, 8, 0, 0]}
+                    maxBarSize={50}
                   />
-                </AreaChart>
+                  <Line 
+                    yAxisId="orders"
+                    type="monotone" 
+                    dataKey="orders" 
+                    stroke="#8B5CF6"
+                    strokeWidth={3}
+                    dot={{ 
+                      fill: "#8B5CF6", 
+                      strokeWidth: 2, 
+                      r: 5,
+                      stroke: useColorModeValue("white", "#1F2937")
+                    }}
+                    activeDot={{ 
+                      r: 7,
+                      stroke: "#8B5CF6",
+                      strokeWidth: 3,
+                      fill: useColorModeValue("white", "#1F2937")
+                    }}
+                  />
+                </ComposedChart>
               </ResponsiveContainer>
             </Box>
           </MotionBox>
