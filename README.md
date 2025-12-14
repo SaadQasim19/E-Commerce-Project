@@ -1,6 +1,5 @@
 # 🛒 E-Commerce Project - Complete Authentication System
 
-> For the complete system documentation (modules, tech stack, usage, troubleshooting), see **[OFFICIAL_PROJECT_DOCUMENTATION.md](OFFICIAL_PROJECT_DOCUMENTATION.md)**
 
 A modern, full-stack e-commerce application with **Google OAuth authentication**, real-time password validation, and a beautiful UI.
 
@@ -121,7 +120,6 @@ GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 ```
 
-❗ **Never commit `.env` files**
 
 ---
 
@@ -209,7 +207,7 @@ GET    /api/auth/google/callback
 
 ---
 
-## User Schema (Simplified)
+## User Schema 
 
 ```js
 {
