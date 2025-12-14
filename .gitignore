@@ -1,21 +1,6 @@
 node_modules/
 .env
 
-# Ignore documentation files (per user request)
-OFFICIAL_PROJECT_DOCUMENTATION.md
-GOOGLE_OAUTH_SETUP.md
-DESIGN_IMPROVEMENTS.md
-WHAT_HAS_BEEN_DONE.md
-FIX_SUMMARY.md
-NOTIFICATION_SYSTEM_COMPLETE.md
-NOTIFICATION_VISUAL_GUIDE.md
-AUTH_SYSTEM_README.md
-NEXT_FEATURES_PLAN.md
-UI_PREVIEW.md
-QUICK_REFERENCE.md
-PRODUCT_CREATION_FIX.md
-MODERNIZATION_SUMMARY.md
-# README.md is usually tracked; uncomment next line only if you truly want to ignore it
-# README.md
 
+Documentation
 
