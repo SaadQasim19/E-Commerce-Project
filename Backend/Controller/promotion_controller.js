@@ -1,5 +1,6 @@
 import User from '../models/user.model.js';
 import { createNotificationHelper } from './notification_controller.js';
+import socketService from '../services/socket.service.js';
 
 /**
  * Send promotional notification to all users
@@ -37,6 +38,14 @@ export const broadcastPromotion = async (req, res) => {
     );
 
     await Promise.all(notificationPromises);
+
+    // Emit real-time promotion event to all clients
+    socketService.notifyPromotionCreated({
+      title,
+      message,
+      type: 'promotion',
+      validUntil: null,
+    });
 
     res.status(200).json({
       success: true,

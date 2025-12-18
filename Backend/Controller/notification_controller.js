@@ -1,4 +1,5 @@
 import Notification from '../models/notification.model.js';
+import socketService from '../services/socket.service.js';
 
 // @desc    Get all notifications for logged-in user
 // @route   GET /api/notifications
@@ -221,7 +222,7 @@ export const createNotification = async (req, res) => {
 // Helper function to create notification (can be called from other controllers)
 export const createNotificationHelper = async (userId, type, title, message, link = null, icon = 'bell', priority = 'medium') => {
   try {
-    await Notification.create({
+    const notification = await Notification.create({
       user: userId,
       type,
       title,
@@ -230,6 +231,10 @@ export const createNotificationHelper = async (userId, type, title, message, lin
       icon,
       priority,
     });
+
+    // Emit real-time notification to user
+    socketService.notifyUser(userId.toString(), notification);
+
     return true;
   } catch (error) {
     console.error('Error creating notification:', error);

@@ -2,6 +2,7 @@ import productModel from "../models/product.model.js";
 import User from "../models/user.model.js";
 import mongoose from "mongoose";
 import { createNotificationHelper } from "./notification_controller.js";
+import socketService from "../services/socket.service.js";
 
 //! GET PRODUCTS
 export const getProducts = async (req, res) => {
@@ -65,45 +66,73 @@ export const updateProduct = async (req, res) => {
   //^ userProductId is the id that we pass in url
   //^ userProduct is the data that we pass in body
 
+  // Start session for transaction if updating quantity
+  const session = userProduct.quantity !== undefined ? await mongoose.startSession() : null;
+
   try {
-    const updatedProduct = await productModel.findByIdAndUpdate(
-      userProductId,
-      userProduct,
-      { new: true, runValidators: true }
-    );
+    let updatedProduct;
 
-    // Check for low stock and notify admins
-    const LOW_STOCK_THRESHOLD = 10;
-    if (updatedProduct.quantity <= LOW_STOCK_THRESHOLD && updatedProduct.quantity > 0) {
-      const admins = await User.find({ role: 'admin' });
-      for (const admin of admins) {
-        await createNotificationHelper(
-          admin._id,
-          'product',
-          '⚠️ Low Stock Alert',
-          `Product "${updatedProduct.name}" has only ${updatedProduct.quantity} items left in stock!`,
-          `/admin/products/${updatedProduct._id}`,
-          'alert-triangle',
-          'high'
+    if (session) {
+      // Use transaction for stock updates
+      await session.withTransaction(async () => {
+        updatedProduct = await productModel.findByIdAndUpdate(
+          userProductId,
+          userProduct,
+          { new: true, runValidators: true, session }
         );
-      }
+
+        if (!updatedProduct) {
+          throw new Error("Product not found");
+        }
+
+        // Check for low stock and notify admins
+        const LOW_STOCK_THRESHOLD = 10;
+        if (updatedProduct.quantity <= LOW_STOCK_THRESHOLD && updatedProduct.quantity > 0) {
+          const admins = await User.find({ role: 'admin' }).session(session);
+          for (const admin of admins) {
+            await createNotificationHelper(
+              admin._id,
+              'product',
+              '⚠️ Low Stock Alert',
+              `Product "${updatedProduct.name}" has only ${updatedProduct.quantity} items left in stock!`,
+              `/admin/products/${updatedProduct._id}`,
+              'alert-triangle',
+              'high'
+            );
+          }
+          // Real-time low stock alert
+          socketService.notifyLowStock(updatedProduct);
+        }
+
+        // Out of stock notification
+        if (updatedProduct.quantity === 0) {
+          const admins = await User.find({ role: 'admin' }).session(session);
+          for (const admin of admins) {
+            await createNotificationHelper(
+              admin._id,
+              'product',
+              '🚨 Out of Stock',
+              `Product "${updatedProduct.name}" is now out of stock!`,
+              `/admin/products/${updatedProduct._id}`,
+              'x-circle',
+              'high'
+            );
+          }
+          // Real-time out of stock alert
+          socketService.notifyOutOfStock(updatedProduct);
+        }
+      });
+    } else {
+      // Simple update without transaction
+      updatedProduct = await productModel.findByIdAndUpdate(
+        userProductId,
+        userProduct,
+        { new: true, runValidators: true }
+      );
     }
 
-    // Out of stock notification
-    if (updatedProduct.quantity === 0) {
-      const admins = await User.find({ role: 'admin' });
-      for (const admin of admins) {
-        await createNotificationHelper(
-          admin._id,
-          'product',
-          '🚨 Out of Stock',
-          `Product "${updatedProduct.name}" is now out of stock!`,
-          `/admin/products/${updatedProduct._id}`,
-          'x-circle',
-          'high'
-        );
-      }
-    }
+    // Broadcast product update to all clients
+    socketService.broadcastProductUpdate(updatedProduct);
 
     res
       .status(200)
@@ -114,7 +143,11 @@ export const updateProduct = async (req, res) => {
       });
   } catch (error) {
     console.error("Error in updating product", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    res.status(500).json({ success: false, message: error.message || "Internal Server Error" });
+  } finally {
+    if (session) {
+      session.endSession();
+    }
   }
 }
 

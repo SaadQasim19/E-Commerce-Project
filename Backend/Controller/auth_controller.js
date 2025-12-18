@@ -3,25 +3,25 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { createNotificationHelper } from "./notification_controller.js";
 
-// Generate JWT Token
+//* Generate JWT Token
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE || "30d",
   });
 };
 
-// Send token response (cookie + JSON)
+//* Send token response (cookie + JSON)
 const sendTokenResponse = (user, statusCode, res, message) => {
-  // Create token
+  //* Create token
   const token = generateToken(user._id);
 
-  // Cookie options
+  //* Cookie options
   const options = {
     expires: new Date(
       Date.now() + (process.env.JWT_COOKIE_EXPIRE || 30) * 24 * 60 * 60 * 1000
     ),
-    httpOnly: true, // Prevent XSS attacks
-    secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+    httpOnly: true, //* Prevent XSS attacks
+    secure: process.env.NODE_ENV === "production", //* Use secure cookies in production
     sameSite: "strict",
   };
 
@@ -41,14 +41,14 @@ const sendTokenResponse = (user, statusCode, res, message) => {
   });
 };
 
-// @desc    Register new user
-// @route   POST /api/auth/signup
-// @access  Public
+//* @desc    Register new user
+//* @route   POST /api/auth/signup
+//* @access  Public
 export const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Validation
+    //* Validation
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -56,7 +56,7 @@ export const signup = async (req, res) => {
       });
     }
 
-    // Check if user already exists
+    //* Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -65,14 +65,14 @@ export const signup = async (req, res) => {
       });
     }
 
-    // Create user
+    //* Create user
     const user = await User.create({
       name,
       email,
-      password, // Will be hashed by pre-save middleware
+      password, //* Will be hashed by pre-save middleware
     });
 
-    // Create welcome notification for user
+    //* Create welcome notification for user
     await createNotificationHelper(
       user._id,
       'system',
@@ -83,7 +83,7 @@ export const signup = async (req, res) => {
       'high'
     );
 
-    // Notify admins about new user registration
+    //* Notify admins about new user registration
     const admins = await User.find({ role: 'admin' });
     for (const admin of admins) {
       await createNotificationHelper(
@@ -97,12 +97,12 @@ export const signup = async (req, res) => {
       );
     }
 
-    // Send token response
+    //* Send token response
     sendTokenResponse(user, 201, res, "User registered successfully");
   } catch (error) {
     console.error("Signup Error:", error);
     
-    // Handle validation errors
+    //* Handle validation errors
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({
@@ -119,14 +119,14 @@ export const signup = async (req, res) => {
   }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
+//* @desc    Login user
+//* @route   POST /api/auth/login
+//* @access  Public
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validation
+    //* Validation
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -134,7 +134,7 @@ export const login = async (req, res) => {
       });
     }
 
-    // Find user by email (include password for comparison)
+    //* Find user by email (include password for comparison)
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
@@ -144,7 +144,7 @@ export const login = async (req, res) => {
       });
     }
 
-    // Check if password matches
+    //* Check if password matches
     const isPasswordMatch = await user.comparePassword(password);
 
     if (!isPasswordMatch) {
@@ -154,11 +154,11 @@ export const login = async (req, res) => {
       });
     }
 
-    // Update last login
+    //* Update last login
     user.lastLogin = Date.now();
     await user.save();
 
-    // Send token response
+    //* Send token response
     sendTokenResponse(user, 200, res, "Login successful");
   } catch (error) {
     console.error("Login Error:", error);
@@ -170,13 +170,13 @@ export const login = async (req, res) => {
   }
 };
 
-// @desc    Logout user / clear cookie
-// @route   POST /api/auth/logout
-// @access  Private
+//* @desc    Logout user / clear cookie
+//* @route   POST /api/auth/logout
+//* @access  Private
 export const logout = async (req, res) => {
   try {
     res.cookie("token", "none", {
-      expires: new Date(Date.now() + 10 * 1000), // 10 seconds
+      expires: new Date(Date.now() + 10 * 1000), //* 10 seconds
       httpOnly: true,
     });
 
@@ -193,12 +193,12 @@ export const logout = async (req, res) => {
   }
 };
 
-// @desc    Get current logged in user
-// @route   GET /api/auth/me
-// @access  Private
+//* @desc    Get current logged in user
+//* @route   GET /api/auth/me
+//* @access  Private
 export const getMe = async (req, res) => {
   try {
-    // User is already available in req.user from auth middleware
+    //* User is already available in req.user from auth middleware
     const user = await User.findById(req.user._id);
 
     res.status(200).json({
@@ -214,9 +214,9 @@ export const getMe = async (req, res) => {
   }
 };
 
-// @desc    Update user profile
-// @route   PUT /api/auth/update-profile
-// @access  Private
+//* @desc    Update user profile
+//* @route   PUT /api/auth/update-profile
+//* @access  Private
 export const updateProfile = async (req, res) => {
   try {
     const { name, phone, avatar } = req.body;
@@ -235,7 +235,7 @@ export const updateProfile = async (req, res) => {
       }
     );
 
-    // Send profile update notification (only for significant changes)
+    //* Send profile update notification (only for significant changes)
     if (name || avatar) {
       await createNotificationHelper(
         user._id,
@@ -263,9 +263,9 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-// @desc    Update password
-// @route   PUT /api/auth/update-password
-// @access  Private
+//* @desc    Update password
+//* @route   PUT /api/auth/update-password
+//* @access  Private
 export const updatePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -277,10 +277,10 @@ export const updatePassword = async (req, res) => {
       });
     }
 
-    // Get user with password
+    //* Get user with password
     const user = await User.findById(req.user._id).select("+password");
 
-    // Check current password
+    //* Check current password
     const isMatch = await user.comparePassword(currentPassword);
     if (!isMatch) {
       return res.status(401).json({
@@ -289,11 +289,11 @@ export const updatePassword = async (req, res) => {
       });
     }
 
-    // Update password
+    //* Update password
     user.password = newPassword;
     await user.save();
 
-    // Send security notification
+    //* Send security notification
     await createNotificationHelper(
       user._id,
       'user',
@@ -304,7 +304,7 @@ export const updatePassword = async (req, res) => {
       'high'
     );
 
-    // Send token response
+    //* Send token response
     sendTokenResponse(user, 200, res, "Password updated successfully");
   } catch (error) {
     console.error("Update Password Error:", error);
@@ -316,9 +316,9 @@ export const updatePassword = async (req, res) => {
   }
 };
 
-// @desc    Forgot password
-// @route   POST /api/auth/forgot-password
-// @access  Public
+//* @desc    Forgot password
+//* @route   POST /api/auth/forgot-password
+//* @access  Public
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -332,31 +332,31 @@ export const forgotPassword = async (req, res) => {
       });
     }
 
-    // Generate reset token
+    //* Generate reset token
     const resetToken = crypto.randomBytes(20).toString("hex");
 
-    // Hash token and set to resetPasswordToken field
+    //* Hash token and set to resetPasswordToken field
     user.resetPasswordToken = crypto
       .createHash("sha256")
       .update(resetToken)
       .digest("hex");
 
-    // Set expire time (10 minutes)
+    //* Set expire time (10 minutes)
     user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
 
     await user.save({ validateBeforeSave: false });
 
-    // Create reset URL
-    const resetUrl = `${req.protocol}://${req.get(
+    //* Create reset URL
+    const resetUrl = `${req.protocol}://*${req.get(
       "host"
     )}/reset-password/${resetToken}`;
 
-    // TODO: Send email with reset URL
-    // For now, we'll just return the token in response (NOT RECOMMENDED IN PRODUCTION)
+    //* TODO: Send email with reset URL
+    //* For now, we'll just return the token in response (NOT RECOMMENDED IN PRODUCTION)
     res.status(200).json({
       success: true,
       message: "Password reset token generated",
-      resetToken, // In production, send this via email instead
+      resetToken, //* In production, send this via email instead
       resetUrl,
     });
   } catch (error) {
@@ -368,14 +368,14 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-// @desc    Reset password
-// @route   PUT /api/auth/reset-password/:resetToken
-// @access  Public
+//* @desc    Reset password
+//* @route   PUT /api/auth/reset-password/:resetToken
+//* @access  Public
 export const resetPassword = async (req, res) => {
   try {
     const { newPassword } = req.body;
 
-    // Get hashed token
+    //* Get hashed token
     const resetPasswordToken = crypto
       .createHash("sha256")
       .update(req.params.resetToken)
@@ -393,13 +393,13 @@ export const resetPassword = async (req, res) => {
       });
     }
 
-    // Set new password
+    //* Set new password
     user.password = newPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
     await user.save();
 
-    // Send token response
+    //* Send token response
     sendTokenResponse(user, 200, res, "Password reset successful");
   } catch (error) {
     console.error("Reset Password Error:", error);
@@ -410,14 +410,14 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-// @desc    Delete user account
-// @route   DELETE /api/auth/delete-account
-// @access  Private
+//* @desc    Delete user account
+//* @route   DELETE /api/auth/delete-account
+//* @access  Private
 export const deleteAccount = async (req, res) => {
   try {
     const { password } = req.body;
 
-    // Validation
+    //* Validation
     if (!password) {
       return res.status(400).json({
         success: false,
@@ -425,7 +425,7 @@ export const deleteAccount = async (req, res) => {
       });
     }
 
-    // Get user with password
+    //* Get user with password
     const user = await User.findById(req.user._id).select("+password");
 
     if (!user) {
@@ -435,7 +435,7 @@ export const deleteAccount = async (req, res) => {
       });
     }
 
-    // Verify password
+    //* Verify password
     const isPasswordMatch = await user.comparePassword(password);
 
     if (!isPasswordMatch) {
@@ -445,7 +445,7 @@ export const deleteAccount = async (req, res) => {
       });
     }
 
-    // Delete user's avatar from local storage if exists
+    //* Delete user's avatar from local storage if exists
     if (user.avatar && user.avatar.startsWith('/uploads/')) {
       try {
         const path = await import('path');
@@ -462,20 +462,20 @@ export const deleteAccount = async (req, res) => {
         }
       } catch (error) {
         console.error('Error deleting avatar:', error);
-        // Continue with account deletion even if avatar deletion fails
+        //* Continue with account deletion even if avatar deletion fails
       }
     }
 
-    // TODO: Delete user's related data (orders, reviews, etc.)
-    // This should be done based on your business logic
-    // Example:
-    // await Order.deleteMany({ user: user._id });
-    // await Review.deleteMany({ user: user._id });
+    //* TODO: Delete user's related data (orders, reviews, etc.)
+    //* This should be done based on your business logic
+    //* Example:
+    //* await Order.deleteMany({ user: user._id });
+    //* await Review.deleteMany({ user: user._id });
 
-    // Delete user account
+    //* Delete user account
     await User.findByIdAndDelete(user._id);
 
-    // Clear cookie
+    //* Clear cookie
     res.cookie("token", "none", {
       expires: new Date(Date.now() + 1 * 1000),
       httpOnly: true,
