@@ -1,9 +1,7 @@
 import axios from 'axios';
 
-/**
- * External Product API Service
- * Integrates with multiple free product APIs to fetch real products
- */
+//** External Product API Service , Integrates with multiple free product APIs to fetch real products , also dummy data for testing
+ 
 
 // API Sources Configuration
 const API_SOURCES = {
