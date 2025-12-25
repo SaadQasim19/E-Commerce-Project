@@ -26,10 +26,10 @@ export const getProducts = async (req, res) => {
 export const createProduct = async (req, res) => {
   const userProduct = req.body; //^ (body) data that we post on postman/client...
   
-  console.log('📦 Create Product Request:', userProduct);
+  console.log(' Create Product Request:', userProduct);
   
   if (!userProduct.name || !userProduct.price || !userProduct.image) {
-    console.log('❌ Validation failed - Missing required fields');
+    console.log(' Validation failed - Missing required fields');
     return res
       .status(400)
       .json({ success: false, message: "Required Fields are missing." });
@@ -47,7 +47,7 @@ export const createProduct = async (req, res) => {
         product: newProduct,
       });
   } catch (error) {
-    console.error("❌ Error in creating product:", error);
+    console.error(" Error in creating product:", error);
     res.status(500).json({ success: false, message: error.message || "Internal Server Error" });
   }
 }
@@ -66,7 +66,7 @@ export const updateProduct = async (req, res) => {
   //^ userProductId is the id that we pass in url
   //^ userProduct is the data that we pass in body
 
-  // Start session for transaction if updating quantity
+  //* Start session for transaction if updating quantity
   const session = userProduct.quantity !== undefined ? await mongoose.startSession() : null;
 
   try {

@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 // Upload/Update Avatar (Local Storage)
 export const uploadAvatar = async (req, res) => {
   try {
-    console.log('📸 Avatar upload request from user:', req.user._id);
+    console.log(' Avatar upload request from user:', req.user._id);
 
     if (!req.file) {
       return res.status(400).json({

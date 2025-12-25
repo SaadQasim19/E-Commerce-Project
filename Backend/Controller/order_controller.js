@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import { createNotificationHelper } from "./notification_controller.js";
 import socketService from "../services/socket.service.js";
 
-// Create a new order with transaction support
+//* Create a new order with transaction support
 export const createOrder = async (req, res) => {
   const orderData = req.body;
 
@@ -29,13 +29,13 @@ export const createOrder = async (req, res) => {
     });
   }
 
-  // Start a MongoDB session for transaction
+  //* Start a MongoDB session for transaction
   const session = await mongoose.startSession();
 
   try {
-    // Start transaction
+    //* Start transaction (ACID)
     await session.withTransaction(async () => {
-      // 1) Validate and reserve stock for all items
+      //^ 1) Validate and reserve stock for all items
       for (const item of orderData.items) {
         const product = await Product.findById(item.productId).session(session);
         
@@ -49,7 +49,7 @@ export const createOrder = async (req, res) => {
           );
         }
 //* Transaction is used*/
-        // Decrement stock atomically
+        //^ Decrement stock atomically
         const updateResult = await Product.updateOne(
           {
             _id: item.productId,
