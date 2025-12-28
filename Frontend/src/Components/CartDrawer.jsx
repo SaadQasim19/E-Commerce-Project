@@ -22,6 +22,7 @@ import { AddIcon, MinusIcon, DeleteIcon } from "@chakra-ui/icons";
 import { FiShoppingCart } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import useCartStore from "../Store/cart";
+import { getProductId } from "../utils/productIdHelper";
 
 const CartDrawer = ({ isOpen, onClose }) => {
   const {
@@ -67,7 +68,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
             <VStack spacing={4} align="stretch">
               {cartItems.map((item) => (
                 <Box
-                  key={item._id}
+                  key={getProductId(item)}
                   p={4}
                   bg={bg}
                   borderRadius="md"
@@ -99,7 +100,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                         <IconButton
                           size="xs"
                           icon={<MinusIcon />}
-                          onClick={() => decreaseQuantity(item._id)}
+                          onClick={() => decreaseQuantity(getProductId(item))}
                           aria-label="Decrease quantity"
                           colorScheme="gray"
                         />
@@ -109,7 +110,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                         <IconButton
                           size="xs"
                           icon={<AddIcon />}
-                          onClick={() => increaseQuantity(item._id)}
+                          onClick={() => increaseQuantity(getProductId(item))}
                           aria-label="Increase quantity"
                           colorScheme="gray"
                         />
@@ -124,7 +125,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                       <IconButton
                         size="sm"
                         icon={<DeleteIcon />}
-                        onClick={() => removeFromCart(item._id)}
+                        onClick={() => removeFromCart(getProductId(item))}
                         colorScheme="red"
                         variant="ghost"
                         aria-label="Remove item"

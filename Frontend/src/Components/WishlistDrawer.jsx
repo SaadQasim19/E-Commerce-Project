@@ -23,6 +23,7 @@ import {
 import { FiTrash2, FiShoppingCart } from "react-icons/fi";
 import useWishlistStore from "../Store/wishlist";
 import useCartStore from "../Store/cart";
+import { getProductId } from "../utils/productIdHelper";
 
 const WishlistDrawer = ({ isOpen, onClose }) => {
   const { wishlistItems, removeFromWishlist, clearWishlist } = useWishlistStore();
@@ -95,7 +96,7 @@ const WishlistDrawer = ({ isOpen, onClose }) => {
             <VStack spacing={4} align="stretch">
               {wishlistItems.map((item) => (
                 <Box
-                  key={item._id || item.externalId}
+                  key={getProductId(item)}
                   p={4}
                   bg={bgColor}
                   borderWidth="1px"
@@ -144,7 +145,7 @@ const WishlistDrawer = ({ isOpen, onClose }) => {
                           colorScheme="red"
                           variant="ghost"
                           aria-label="Remove from wishlist"
-                          onClick={() => handleRemove(item._id || item.externalId)}
+                          onClick={() => handleRemove(getProductId(item))}
                         />
                       </HStack>
                     </VStack>

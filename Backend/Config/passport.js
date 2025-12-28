@@ -4,7 +4,7 @@ import { Strategy as FacebookStrategy } from 'passport-facebook';
 import { Strategy as GitHubStrategy } from 'passport-github2';
 import User from '../models/user.model.js';
 
-// Helper function to check if credentials are valid (not placeholders)
+//* Helper function to check if credentials are valid (not placeholders)
 const isValidCredential = (value) => {
   return value && 
          value.trim() !== '' && 
@@ -12,7 +12,7 @@ const isValidCredential = (value) => {
          !value.includes('_here');
 };
 
-// Google OAuth Strategy - Only initialize if credentials are provided
+//* Google OAuth Strategy - Only initialize if credentials are provided
 if (isValidCredential(process.env.GOOGLE_CLIENT_ID) && 
     isValidCredential(process.env.GOOGLE_CLIENT_SECRET)) {
   passport.use(
@@ -20,18 +20,18 @@ if (isValidCredential(process.env.GOOGLE_CLIENT_ID) &&
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback',
+        callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://*localhost:5000/api/auth/google/callback',
       },
       async (accessToken, refreshToken, profile, done) => {
       try {
-        // Check if user already exists with this Google ID
+        //* Check if user already exists with this Google ID
         let user = await User.findOne({ googleId: profile.id });
 
         if (user) {
           return done(null, user);
         }
 
-        // Check if user exists with the same email
+        //* Check if user exists with the same email
         const email = profile.emails?.[0]?.value;
         if (email) {
           user = await User.findOne({ email });
@@ -43,7 +43,7 @@ if (isValidCredential(process.env.GOOGLE_CLIENT_ID) &&
           }
         }
 
-        // Create new user
+        //* Create new user
         const newUser = await User.create({
           googleId: profile.id,
           name: profile.displayName,
@@ -65,7 +65,7 @@ if (isValidCredential(process.env.GOOGLE_CLIENT_ID) &&
   console.log('○ Google OAuth disabled (credentials not configured)');
 }
 
-// Facebook OAuth Strategy - Only initialize if credentials are provided
+//* Facebook OAuth Strategy - Only initialize if credentials are provided
 if (isValidCredential(process.env.FACEBOOK_APP_ID) && 
     isValidCredential(process.env.FACEBOOK_APP_SECRET)) {
   passport.use(
@@ -73,19 +73,19 @@ if (isValidCredential(process.env.FACEBOOK_APP_ID) &&
       {
         clientID: process.env.FACEBOOK_APP_ID,
         clientSecret: process.env.FACEBOOK_APP_SECRET,
-        callbackURL: process.env.FACEBOOK_CALLBACK_URL || 'http://localhost:5000/api/auth/facebook/callback',
+        callbackURL: process.env.FACEBOOK_CALLBACK_URL || 'http://*localhost:5000/api/auth/facebook/callback',
         profileFields: ['id', 'displayName', 'emails', 'photos'],
       },
       async (accessToken, refreshToken, profile, done) => {
       try {
-        // Check if user already exists with this Facebook ID
+        //* Check if user already exists with this Facebook ID
         let user = await User.findOne({ facebookId: profile.id });
 
         if (user) {
           return done(null, user);
         }
 
-        // Check if user exists with the same email
+        //* Check if user exists with the same email
         const email = profile.emails?.[0]?.value;
         if (email) {
           user = await User.findOne({ email });
@@ -97,7 +97,7 @@ if (isValidCredential(process.env.FACEBOOK_APP_ID) &&
           }
         }
 
-        // Create new user
+        //* Create new user
         const newUser = await User.create({
           facebookId: profile.id,
           name: profile.displayName,
@@ -119,7 +119,7 @@ if (isValidCredential(process.env.FACEBOOK_APP_ID) &&
   console.log(' Facebook OAuth disabled (credentials not configured)');
 }
 
-// GitHub OAuth Strategy - Only initialize if credentials are provided
+//* GitHub OAuth Strategy - Only initialize if credentials are provided
 if (isValidCredential(process.env.GITHUB_CLIENT_ID) && 
     isValidCredential(process.env.GITHUB_CLIENT_SECRET)) {
   passport.use(
@@ -127,19 +127,19 @@ if (isValidCredential(process.env.GITHUB_CLIENT_ID) &&
       {
         clientID: process.env.GITHUB_CLIENT_ID,
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
-        callbackURL: process.env.GITHUB_CALLBACK_URL || 'http://localhost:5000/api/auth/github/callback',
+        callbackURL: process.env.GITHUB_CALLBACK_URL || 'http://*localhost:5000/api/auth/github/callback',
         scope: ['user:email'],
       },
       async (accessToken, refreshToken, profile, done) => {
       try {
-        // Check if user already exists with this GitHub ID
+        //* Check if user already exists with this GitHub ID
         let user = await User.findOne({ githubId: profile.id });
 
         if (user) {
           return done(null, user);
         }
 
-        // Check if user exists with the same email
+        //* Check if user exists with the same email
         const email = profile.emails?.[0]?.value;
         if (email) {
           user = await User.findOne({ email });
@@ -151,7 +151,7 @@ if (isValidCredential(process.env.GITHUB_CLIENT_ID) &&
           }
         }
 
-        // Create new user
+        //* Create new user
         const newUser = await User.create({
           githubId: profile.id,
           name: profile.displayName || profile.username,
@@ -173,12 +173,12 @@ if (isValidCredential(process.env.GITHUB_CLIENT_ID) &&
   console.log('○ GitHub OAuth disabled (credentials not configured)');
 }
 
-// Serialize user for the session
+//* Serialize user for the session
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-// Deserialize user from the session
+//* Deserialize user from the session
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findById(id);

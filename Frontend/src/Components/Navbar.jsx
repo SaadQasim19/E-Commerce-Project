@@ -9,6 +9,7 @@ import { IoMoon } from "react-icons/io5";
 import { LuSun } from "react-icons/lu";
 import { MdDashboard, MdStorefront } from "react-icons/md";
 import { FiUser, FiSettings, FiLogOut, FiPackage, FiLogIn } from "react-icons/fi";
+import { AiOutlineHome } from "react-icons/ai";
 import { motion } from "framer-motion";
 import CartIcon from "./CartIcon";
 import CartDrawer from "./CartDrawer";
@@ -140,6 +141,20 @@ export default function Navbar() {
 
             {/* Navigation Items */}
             <HStack spacing={3} alignItems={"center"}>
+              {/* Home / Storefront */}
+              <Tooltip label="View Storefront" placement="bottom">
+                <Link to={"/"}>
+                  <IconButton
+                    icon={<AiOutlineHome size={20} />}
+                    aria-label="Home - View Storefront"
+                    variant="ghost"
+                    colorScheme="green"
+                    _hover={{ bg: hoverBg, transform: "translateY(-2px)" }}
+                    transition="all 0.2s"
+                  />
+                </Link>
+              </Tooltip>
+
               {/* Admin Dashboard */}
               <Tooltip label="Admin Dashboard" placement="bottom">
                 <Link to={"/admin"}>
@@ -320,7 +335,6 @@ export default function Navbar() {
                         size="sm" 
                         name={user.name} 
                         src={getAvatarUrl(user.avatar)}
-                        bg="gradient(to-r, cyan.400, blue.500)"
                       />
                     </MenuButton>
                   </Tooltip>

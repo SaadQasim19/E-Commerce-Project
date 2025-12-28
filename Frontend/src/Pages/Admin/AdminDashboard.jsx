@@ -44,7 +44,6 @@ import {
 } from "react-icons/md";
 import { FiShoppingBag, FiPackage, FiDollarSign, FiUsers, FiTrendingUp } from "react-icons/fi";
 import { useEffect } from "react";
-import { motion } from "framer-motion";
 import {
   LineChart,
   Line,
@@ -65,106 +64,62 @@ import {
 } from "recharts";
 import ProductStore from "../../Store/product";
 
-const MotionBox = motion.create(Box);
-const MotionGrid = motion.create(SimpleGrid);
-
 function StatsCard({ title, stat, icon, change, changeType, gradient, index }) {
   const bg = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.100", "gray.700");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
   const isPositive = changeType === "increase";
 
   return (
-    <MotionBox
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
-      whileHover={{ y: -8, boxShadow: "2xl" }}
+    <Box
+      bg={bg}
+      p={5}
+      borderRadius="md"
+      border="1px solid"
+      borderColor={borderColor}
+      transition="border-color 0.2s"
+      _hover={{
+        borderColor: useColorModeValue("gray.300", "gray.600"),
+      }}
     >
-      <Box
-        position="relative"
-        bg={bg}
-        p={6}
-        borderRadius="2xl"
-        boxShadow="lg"
-        borderWidth="1px"
-        borderColor={borderColor}
-        overflow="hidden"
-        transition="all 0.3s"
-        _hover={{
-          transform: "translateY(-4px)",
-          boxShadow: "2xl",
-        }}
-      >
-        {/* Gradient Background */}
-        <Box
-          position="absolute"
-          top={0}
-          right={0}
-          w="150px"
-          h="150px"
-          bgGradient={gradient}
-          opacity={0.1}
-          borderRadius="full"
-          filter="blur(40px)"
+      <Flex justify="space-between" align="start" mb={3}>
+        <Icon 
+          as={icon} 
+          boxSize={5} 
+          color="gray.500"
         />
-
-        <Flex justify="space-between" align="start" position="relative">
-          <VStack align="start" spacing={3} flex={1}>
-            <Box
-              bgGradient={gradient}
-              p={4}
-              borderRadius="xl"
-              boxShadow="lg"
+        {change && (
+          <HStack spacing={1}>
+            <Icon
+              as={isPositive ? MdArrowUpward : MdArrowDownward}
+              color={isPositive ? "green.600" : "red.600"}
+              boxSize={3}
+            />
+            <Text
+              fontSize="xs"
+              fontWeight="600"
+              color={isPositive ? "green.600" : "red.600"}
             >
-              <Icon as={icon} boxSize={7} color="white" />
-            </Box>
-
-            <VStack align="start" spacing={1}>
-              <Text
-                fontSize="sm"
-                color="gray.500"
-                fontWeight="600"
-                textTransform="uppercase"
-                letterSpacing="wider"
-              >
-                {title}
-              </Text>
-              <Text fontSize="3xl" fontWeight="bold" bgGradient={gradient} bgClip="text">
-                {stat}
-              </Text>
-            </VStack>
-          </VStack>
-
-          <VStack align="end" spacing={2}>
-            {change && (
-              <HStack
-                bg={isPositive ? "green.50" : "red.50"}
-                px={3}
-                py={1}
-                borderRadius="full"
-                spacing={1}
-              >
-                <Icon
-                  as={isPositive ? MdArrowUpward : MdArrowDownward}
-                  color={isPositive ? "green.500" : "red.500"}
-                  boxSize={4}
-                />
-                <Text
-                  fontSize="sm"
-                  fontWeight="bold"
-                  color={isPositive ? "green.600" : "red.600"}
-                >
-                  {change}%
-                </Text>
-              </HStack>
-            )}
-            <Text fontSize="xs" color="gray.500">
-              vs last month
+              {change}%
             </Text>
-          </VStack>
-        </Flex>
-      </Box>
-    </MotionBox>
+          </HStack>
+        )}
+      </Flex>
+
+      <VStack align="start" spacing={0.5}>
+        <Text
+          fontSize="xs"
+          color="gray.500"
+          fontWeight="500"
+          textTransform="uppercase"
+          letterSpacing="wide"
+        >
+          {title}
+        </Text>
+        <Text fontSize="2xl" fontWeight="700" color={useColorModeValue("gray.900", "white")}>
+          {stat}
+        </Text>
+      </VStack>
+    </Box>
   );
 }
 
@@ -211,54 +166,50 @@ export default function AdminDashboard() {
 
   return (
     <Box>
-      {/* Page Header with Actions */}
-      <MotionBox
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        mb={8}
-      >
-        <Flex justify="space-between" align="center" mb={2}>
-          <Box>
-            <Heading
-              size="xl"
-              bgGradient="linear(to-r, cyan.400, blue.500, purple.500)"
-              bgClip="text"
-              mb={2}
-            >
-              Dashboard Overview
-            </Heading>
-            <Text color="gray.500" fontSize="lg">
-              Welcome back! Here's what's happening with your store today.
-            </Text>
-          </Box>
-          <HStack spacing={3}>
-            <IconButton
-              icon={<MdRefresh />}
-              colorScheme="cyan"
+      {/* Page Header */}
+      <Flex justify="space-between" align="center" mb={6}>
+        <Box>
+          <Heading
+            size="lg"
+            fontWeight="600"
+            color={useColorModeValue("gray.900", "white")}
+            mb={1}
+          >
+            Dashboard
+          </Heading>
+          <Text color="gray.500" fontSize="sm">
+            Overview of your store performance
+          </Text>
+        </Box>
+        <HStack spacing={2}>
+          <IconButton
+            icon={<MdRefresh />}
+            variant="ghost"
+            size="sm"
+            color="gray.600"
+            onClick={() => fetchProducts()}
+            aria-label="Refresh"
+          />
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              icon={<MdMoreVert />}
               variant="ghost"
-              size="lg"
-              onClick={() => fetchProducts()}
-              _hover={{ transform: "rotate(180deg)", transition: "0.5s" }}
+              size="sm"
+              color="gray.600"
+              aria-label="More options"
             />
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                icon={<MdMoreVert />}
-                variant="ghost"
-                colorScheme="cyan"
-              />
-              <MenuList>
-                <MenuItem>Export Data</MenuItem>
-                <MenuItem>View Reports</MenuItem>
-                <MenuItem>Settings</MenuItem>
-              </MenuList>
-            </Menu>
-          </HStack>
-        </Flex>
-      </MotionBox>
+            <MenuList>
+              <MenuItem>Export Data</MenuItem>
+              <MenuItem>View Reports</MenuItem>
+              <MenuItem>Settings</MenuItem>
+            </MenuList>
+          </Menu>
+        </HStack>
+      </Flex>
 
       {/* Stats Grid */}
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} mb={8}>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={4} mb={6}>
         <StatsCard
           title="Total Products"
           stat={totalProducts}
@@ -298,327 +249,361 @@ export default function AdminDashboard() {
       </SimpleGrid>
 
       {/* Charts Section */}
-      <Grid templateColumns={{ base: "1fr", lg: "2fr 1fr" }} gap={6} mb={8}>
-        {/* Revenue Chart - Professional E-Commerce Style */}
+      <Grid templateColumns={{ base: "1fr", lg: "2fr 1fr" }} gap={4} mb={6}>
+        {/* Revenue Chart */}
         <GridItem>
-          <MotionBox
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
+          <Box
+            bg={bg}
+            p={5}
+            borderRadius="md"
+            border="1px solid"
+            borderColor={borderColor}
           >
-            <Box
-              bg={bg}
-              p={6}
-              borderRadius="2xl"
-              boxShadow="xl"
-              borderWidth="1px"
-              borderColor={borderColor}
-            >
-              <Flex justify="space-between" align="center" mb={2}>
-                <Box>
-                  <Heading size="md" mb={1}>
-                    Revenue Overview
-                  </Heading>
-                  <Text fontSize="sm" color="gray.500">
-                    Monthly revenue and orders trend
-                  </Text>
-                </Box>
-                <HStack spacing={2}>
-                  <Menu>
-                    <MenuButton
-                      as={IconButton}
-                      icon={<MdMoreVert />}
-                      variant="ghost"
-                      size="sm"
-                      aria-label="Options"
-                    />
-                    <MenuList>
-                      <MenuItem>Last 30 Days</MenuItem>
-                      <MenuItem>Last 3 Months</MenuItem>
-                      <MenuItem>Last 6 Months</MenuItem>
-                      <MenuItem>Last Year</MenuItem>
-                    </MenuList>
-                  </Menu>
-                </HStack>
-              </Flex>
+            <Flex justify="space-between" align="center" mb={4}>
+              <Box>
+                <Heading size="sm" fontWeight="600" mb={1}>
+                  Revenue Overview
+                </Heading>
+                <Text fontSize="xs" color="gray.500">
+                  Monthly revenue and orders
+                </Text>
+              </Box>
+              <Menu>
+                <MenuButton
+                  as={IconButton}
+                  icon={<MdMoreVert />}
+                  variant="ghost"
+                  size="xs"
+                  color="gray.500"
+                  aria-label="Options"
+                />
+                <MenuList fontSize="sm">
+                  <MenuItem>Last 30 Days</MenuItem>
+                  <MenuItem>Last 3 Months</MenuItem>
+                  <MenuItem>Last 6 Months</MenuItem>
+                  <MenuItem>Last Year</MenuItem>
+                </MenuList>
+              </Menu>
+            </Flex>
 
-              {/* Summary Stats Row */}
-              <HStack spacing={6} mb={6} mt={4}>
-                <Box>
-                  <Text fontSize="xs" color="gray.500" fontWeight="600" textTransform="uppercase">
+            {/* Summary Stats - Enhanced */}
+            <Grid 
+              templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} 
+              gap={4} 
+              mb={5}
+              p={4}
+              bg={useColorModeValue("gray.50", "gray.750")}
+              borderRadius="lg"
+            >
+              <Box>
+                <HStack spacing={2} mb={1}>
+                  <Box w={2} h={2} borderRadius="full" bg="blue.500" />
+                  <Text fontSize="xs" color="gray.500" fontWeight="600" textTransform="uppercase" letterSpacing="wide">
                     Total Revenue
                   </Text>
-                  <HStack spacing={2} align="baseline">
-                    <Text fontSize="2xl" fontWeight="bold" color="blue.500">
-                      ${revenueData.reduce((sum, item) => sum + item.revenue, 0).toLocaleString()}
-                    </Text>
-                    <Badge colorScheme="green" fontSize="xs">
-                      <HStack spacing={1}>
-                        <Icon as={MdArrowUpward} boxSize={3} />
-                        <Text>15.3%</Text>
-                      </HStack>
-                    </Badge>
-                  </HStack>
-                </Box>
-                <Box>
-                  <Text fontSize="xs" color="gray.500" fontWeight="600" textTransform="uppercase">
+                </HStack>
+                <HStack spacing={2} align="baseline">
+                  <Text fontSize="2xl" fontWeight="700" color={useColorModeValue("gray.900", "white")}>
+                    ${revenueData.reduce((sum, item) => sum + item.revenue, 0).toLocaleString()}
+                  </Text>
+                  <Badge 
+                    colorScheme="green" 
+                    fontSize="xs" 
+                    px={2} 
+                    py={0.5}
+                    borderRadius="md"
+                    display="flex"
+                    alignItems="center"
+                    gap={0.5}
+                  >
+                    <Icon as={MdArrowUpward} boxSize={3} />
+                    15.3%
+                  </Badge>
+                </HStack>
+              </Box>
+              <Box>
+                <HStack spacing={2} mb={1}>
+                  <Box w={2} h={2} borderRadius="full" bg="green.500" />
+                  <Text fontSize="xs" color="gray.500" fontWeight="600" textTransform="uppercase" letterSpacing="wide">
                     Total Orders
                   </Text>
-                  <HStack spacing={2} align="baseline">
-                    <Text fontSize="2xl" fontWeight="bold" color="purple.500">
-                      {revenueData.reduce((sum, item) => sum + item.orders, 0)}
-                    </Text>
-                    <Badge colorScheme="green" fontSize="xs">
-                      <HStack spacing={1}>
-                        <Icon as={MdArrowUpward} boxSize={3} />
-                        <Text>8.2%</Text>
-                      </HStack>
-                    </Badge>
-                  </HStack>
-                </Box>
-                <Box>
-                  <Text fontSize="xs" color="gray.500" fontWeight="600" textTransform="uppercase">
+                </HStack>
+                <HStack spacing={2} align="baseline">
+                  <Text fontSize="2xl" fontWeight="700" color={useColorModeValue("gray.900", "white")}>
+                    {revenueData.reduce((sum, item) => sum + item.orders, 0)}
+                  </Text>
+                  <Badge 
+                    colorScheme="green" 
+                    fontSize="xs" 
+                    px={2} 
+                    py={0.5}
+                    borderRadius="md"
+                    display="flex"
+                    alignItems="center"
+                    gap={0.5}
+                  >
+                    <Icon as={MdArrowUpward} boxSize={3} />
+                    8.2%
+                  </Badge>
+                </HStack>
+              </Box>
+              <Box>
+                <HStack spacing={2} mb={1}>
+                  <Box w={2} h={2} borderRadius="full" bg="purple.500" />
+                  <Text fontSize="xs" color="gray.500" fontWeight="600" textTransform="uppercase" letterSpacing="wide">
                     Avg Order Value
                   </Text>
-                  <Text fontSize="2xl" fontWeight="bold" color="green.500">
-                    ${(revenueData.reduce((sum, item) => sum + item.revenue, 0) / revenueData.reduce((sum, item) => sum + item.orders, 0)).toFixed(2)}
+                </HStack>
+                <HStack spacing={2} align="baseline">
+                  <Text fontSize="2xl" fontWeight="700" color={useColorModeValue("gray.900", "white")}>
+                    ${(revenueData.reduce((sum, item) => sum + item.revenue, 0) / 
+                       revenueData.reduce((sum, item) => sum + item.orders, 0)).toFixed(2)}
                   </Text>
-                </Box>
-              </HStack>
+                  <Badge 
+                    colorScheme="blue" 
+                    fontSize="xs" 
+                    px={2} 
+                    py={0.5}
+                    borderRadius="md"
+                    display="flex"
+                    alignItems="center"
+                    gap={0.5}
+                  >
+                    <Icon as={MdArrowUpward} boxSize={3} />
+                    6.7%
+                  </Badge>
+                </HStack>
+              </Box>
+            </Grid>
 
-              {/* Professional Combo Chart */}
-              <ResponsiveContainer width="100%" height={320}>
-                <ComposedChart 
-                  data={revenueData}
-                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                >
-                  <defs>
-                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.9} />
-                      <stop offset="100%" stopColor="#60A5FA" stopOpacity={0.7} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid 
-                    strokeDasharray="3 3" 
-                    stroke={useColorModeValue("#E5E7EB", "#374151")} 
-                    vertical={false}
-                  />
-                  <XAxis 
-                    dataKey="month" 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: useColorModeValue("#6B7280", "#9CA3AF"), fontSize: 12 }}
-                    dy={10}
-                  />
-                  <YAxis 
-                    yAxisId="revenue"
-                    orientation="left"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: useColorModeValue("#6B7280", "#9CA3AF"), fontSize: 12 }}
-                    tickFormatter={(value) => `$${(value / 1000).toFixed(1)}k`}
-                  />
-                  <YAxis 
-                    yAxisId="orders"
-                    orientation="right"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: useColorModeValue("#6B7280", "#9CA3AF"), fontSize: 12 }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: useColorModeValue("white", "#1F2937"),
-                      border: `1px solid ${useColorModeValue("#E5E7EB", "#374151")}`,
-                      borderRadius: "12px",
-                      boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
-                      padding: "12px",
-                    }}
-                    labelStyle={{
-                      color: useColorModeValue("#111827", "#F9FAFB"),
-                      fontWeight: "600",
-                      marginBottom: "8px",
-                    }}
-                    formatter={(value, name) => {
-                      if (name === "revenue") return [`$${value.toLocaleString()}`, "Revenue"];
-                      if (name === "orders") return [value, "Orders"];
-                      return [value, name];
-                    }}
-                    cursor={{ fill: useColorModeValue("#F3F4F6", "#374151"), opacity: 0.3 }}
-                  />
-                  <Legend 
-                    wrapperStyle={{ 
-                      paddingTop: "20px",
-                      fontSize: "13px",
-                      fontWeight: "500"
-                    }}
-                    iconType="circle"
-                    formatter={(value) => {
-                      if (value === "revenue") return "Revenue ($)";
-                      if (value === "orders") return "Orders (count)";
-                      return value;
-                    }}
-                  />
-                  <Bar 
-                    yAxisId="revenue"
-                    dataKey="revenue" 
-                    fill="url(#barGradient)"
-                    radius={[8, 8, 0, 0]}
-                    maxBarSize={50}
-                  />
-                  <Line 
-                    yAxisId="orders"
-                    type="monotone" 
-                    dataKey="orders" 
-                    stroke="#8B5CF6"
-                    strokeWidth={3}
-                    dot={{ 
-                      fill: "#8B5CF6", 
-                      strokeWidth: 2, 
-                      r: 5,
-                      stroke: useColorModeValue("white", "#1F2937")
-                    }}
-                    activeDot={{ 
-                      r: 7,
-                      stroke: "#8B5CF6",
-                      strokeWidth: 3,
-                      fill: useColorModeValue("white", "#1F2937")
-                    }}
-                  />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </Box>
-          </MotionBox>
+            {/* Enhanced Chart */}
+            <ResponsiveContainer width="100%" height={320}>
+              <ComposedChart 
+                data={revenueData}
+                margin={{ top: 20, right: 20, left: 10, bottom: 10 }}
+              >
+                <defs>
+                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.9}/>
+                    <stop offset="100%" stopColor="#3B82F6" stopOpacity={0.6}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid 
+                  strokeDasharray="3 3" 
+                  stroke={useColorModeValue("#E5E7EB", "#374151")} 
+                  vertical={false}
+                  strokeOpacity={0.5}
+                />
+                <XAxis 
+                  dataKey="month" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: useColorModeValue("#6B7280", "#9CA3AF"), fontSize: 12, fontWeight: 500 }}
+                  dy={10}
+                />
+                <YAxis 
+                  yAxisId="revenue"
+                  orientation="left"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: useColorModeValue("#6B7280", "#9CA3AF"), fontSize: 11 }}
+                  tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                  dx={-5}
+                />
+                <YAxis 
+                  yAxisId="orders"
+                  orientation="right"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: useColorModeValue("#6B7280", "#9CA3AF"), fontSize: 11 }}
+                  dx={5}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: useColorModeValue("white", "#1F2937"),
+                    border: `1px solid ${useColorModeValue("#E5E7EB", "#374151")}`,
+                    borderRadius: "8px",
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+                    padding: "12px 14px",
+                  }}
+                  labelStyle={{
+                    color: useColorModeValue("#111827", "#F9FAFB"),
+                    fontWeight: "700",
+                    fontSize: "13px",
+                    marginBottom: "6px",
+                  }}
+                  itemStyle={{
+                    padding: "3px 0",
+                    fontSize: "12px",
+                    fontWeight: "500",
+                  }}
+                  formatter={(value, name) => {
+                    if (name === "revenue") return [`$${value.toLocaleString()}`, "Revenue"];
+                    if (name === "orders") return [value, "Orders"];
+                    return [value, name];
+                  }}
+                  cursor={{ fill: useColorModeValue("#F3F4F6", "#374151"), opacity: 0.3 }}
+                />
+                <Legend 
+                  wrapperStyle={{ 
+                    paddingTop: "20px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                  }}
+                  iconType="circle"
+                  iconSize={10}
+                  formatter={(value) => {
+                    if (value === "revenue") return "Revenue";
+                    if (value === "orders") return "Orders";
+                    return value;
+                  }}
+                />
+                <Bar 
+                  yAxisId="revenue"
+                  dataKey="revenue" 
+                  fill="url(#colorRevenue)"
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={48}
+                />
+                <Line 
+                  yAxisId="orders"
+                  type="monotone" 
+                  dataKey="orders" 
+                  stroke="#10B981"
+                  strokeWidth={3}
+                  dot={{ 
+                    fill: "#10B981", 
+                    strokeWidth: 2, 
+                    stroke: useColorModeValue("white", "#1F2937"),
+                    r: 5,
+                  }}
+                  activeDot={{ 
+                    r: 7,
+                    fill: "#10B981",
+                    strokeWidth: 3,
+                    stroke: useColorModeValue("white", "#1F2937"),
+                  }}
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </Box>
         </GridItem>
 
         {/* Category Distribution */}
         <GridItem>
-          <MotionBox
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
+          <Box
+            bg={bg}
+            p={5}
+            borderRadius="md"
+            border="1px solid"
+            borderColor={borderColor}
+            h="full"
           >
-            <Box
-              bg={bg}
-              p={6}
-              borderRadius="2xl"
-              boxShadow="xl"
-              borderWidth="1px"
-              borderColor={borderColor}
-              h="full"
-            >
-              <Heading size="md" mb={4}>
-                Sales by Category
-              </Heading>
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie
-                    data={categoryData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {categoryData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <VStack spacing={2} mt={4}>
-                {categoryData.map((cat, index) => (
-                  <HStack key={index} w="full" justify="space-between">
-                    <HStack>
-                      <Box w={3} h={3} borderRadius="full" bg={cat.color} />
-                      <Text fontSize="sm">{cat.name}</Text>
-                    </HStack>
-                    <Text fontSize="sm" fontWeight="bold">
-                      {cat.value}%
-                    </Text>
+            <Heading size="sm" fontWeight="600" mb={4}>
+              Sales by Category
+            </Heading>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={categoryData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={70}
+                  paddingAngle={2}
+                  dataKey="value"
+                >
+                  {categoryData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <VStack spacing={2} mt={3}>
+              {categoryData.map((cat, index) => (
+                <HStack key={index} w="full" justify="space-between">
+                  <HStack spacing={2}>
+                    <Box w={2.5} h={2.5} borderRadius="full" bg={cat.color} />
+                    <Text fontSize="xs" fontWeight="500">{cat.name}</Text>
                   </HStack>
-                ))}
-              </VStack>
-            </Box>
-          </MotionBox>
+                  <Text fontSize="xs" fontWeight="600" color="gray.600">
+                    {cat.value}%
+                  </Text>
+                </HStack>
+              ))}
+            </VStack>
+          </Box>
         </GridItem>
       </Grid>
 
       {/* Recent Orders and Top Products */}
-      <Grid templateColumns={{ base: "1fr", lg: "2fr 1fr" }} gap={6}>
+      <Grid templateColumns={{ base: "1fr", lg: "2fr 1fr" }} gap={4}>
         {/* Recent Orders */}
         <GridItem>
-          <MotionBox
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
+          <Box
+            bg={bg}
+            p={5}
+            borderRadius="md"
+            border="1px solid"
+            borderColor={borderColor}
           >
-            <Box
-              bg={bg}
-              p={6}
-              borderRadius="2xl"
-              boxShadow="xl"
-              borderWidth="1px"
-              borderColor={borderColor}
-            >
-              <Flex justify="space-between" align="center" mb={6}>
-                <Box>
-                  <Heading size="md" mb={1}>
-                    Recent Orders
-                  </Heading>
-                  <Text fontSize="sm" color="gray.500">
-                    Latest customer orders
-                  </Text>
-                </Box>
-                <Text
-                  fontSize="sm"
-                  color="cyan.500"
-                  cursor="pointer"
-                  fontWeight="600"
-                  _hover={{ textDecoration: "underline" }}
-                >
-                  View All →
+            <Flex justify="space-between" align="center" mb={4}>
+              <Box>
+                <Heading size="sm" fontWeight="600" mb={1}>
+                  Recent Orders
+                </Heading>
+                <Text fontSize="xs" color="gray.500">
+                  Latest transactions
                 </Text>
-              </Flex>
-              <Box overflowX="auto">
-                <Table variant="simple">
-                  <Thead>
-                    <Tr>
-                      <Th>Order ID</Th>
-                      <Th>Customer</Th>
-                      <Th isNumeric>Amount</Th>
-                      <Th>Status</Th>
-                      <Th>Time</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {recentOrders.map((order) => (
-                      <Tr
-                        key={order.id}
-                        _hover={{ bg: useColorModeValue("gray.50", "gray.700") }}
-                        transition="all 0.2s"
-                      >
-                        <Td fontWeight="bold" color="cyan.500">
-                          {order.id}
-                        </Td>
-                        <Td>
-                          <HStack>
-                            <Avatar size="sm" name={order.customer} />
-                            <Text>{order.customer}</Text>
-                          </HStack>
-                        </Td>
-                        <Td isNumeric fontWeight="bold">
-                          ${order.amount.toFixed(2)}
-                        </Td>
-                        <Td>
-                          <Badge
-                            colorScheme={
-                              order.status === "completed"
-                                ? "green"
-                                : order.status === "pending"
-                                ? "orange"
-                                : order.status === "shipped"
+              </Box>
+              <Text
+                fontSize="xs"
+                color="blue.600"
+                cursor="pointer"
+                fontWeight="500"
+                _hover={{ textDecoration: "underline" }}
+              >
+                View all
+              </Text>
+            </Flex>
+            <Box overflowX="auto">
+              <Table variant="simple" size="sm">
+                <Thead>
+                  <Tr>
+                    <Th fontSize="xs">Order ID</Th>
+                    <Th fontSize="xs">Customer</Th>
+                    <Th fontSize="xs" isNumeric>Amount</Th>
+                    <Th fontSize="xs">Status</Th>
+                    <Th fontSize="xs">Time</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {recentOrders.map((order) => (
+                    <Tr
+                      key={order.id}
+                      _hover={{ bg: useColorModeValue("gray.50", "gray.700") }}
+                    >
+                      <Td fontSize="xs" fontWeight="600" color="blue.600">
+                        {order.id}
+                      </Td>
+                      <Td fontSize="xs">
+                        <HStack spacing={2}>
+                          <Avatar size="xs" name={order.customer} />
+                          <Text>{order.customer}</Text>
+                        </HStack>
+                      </Td>
+                      <Td fontSize="xs" isNumeric fontWeight="600">
+                        ${order.amount.toFixed(2)}
+                      </Td>
+                      <Td>
+                        <Badge
+                          colorScheme={
+                            order.status === "completed"
+                              ? "green"
+                              : order.status === "pending"
+                              ? "yellow"
+                              : order.status === "shipped"
                                 ? "purple"
                                 : "blue"
                             }
@@ -641,178 +626,159 @@ export default function AdminDashboard() {
                 </Table>
               </Box>
             </Box>
-          </MotionBox>
         </GridItem>
 
-        {/* Top Products */}
+        {/* Top Products - Enhanced */}
         <GridItem>
-          <MotionBox
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
+          <Box
+            bg={bg}
+            p={5}
+            borderRadius="md"
+            border="1px solid"
+            borderColor={borderColor}
           >
-            <Box
-              bg={bg}
-              p={6}
-              borderRadius="2xl"
-              boxShadow="xl"
-              borderWidth="1px"
-              borderColor={borderColor}
-            >
-              <Heading size="md" mb={6}>
-                Top Performing Products
-              </Heading>
-              <VStack spacing={4} align="stretch">
-                {oldProduct.slice(0, 5).map((product, index) => (
-                  <MotionBox
+            <Flex justify="space-between" align="center" mb={4}>
+              <Box>
+                <Heading size="sm" fontWeight="600" mb={0.5}>
+                  Top Products
+                </Heading>
+                <Text fontSize="xs" color="gray.500">
+                  Best selling this month
+                </Text>
+              </Box>
+              <Text
+                fontSize="xs"
+                color="blue.600"
+                cursor="pointer"
+                fontWeight="500"
+                _hover={{ textDecoration: "underline" }}
+              >
+                View all
+              </Text>
+            </Flex>
+            <VStack spacing={0} align="stretch">
+              {oldProduct.slice(0, 5).map((product, index) => {
+                const salesGrowth = (Math.random() * 30 + 10).toFixed(1);
+                const totalSales = Math.floor(Math.random() * 500 + 100);
+                const isPositive = Math.random() > 0.2; // 80% positive growth
+                
+                return (
+                  <Box
                     key={product._id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 * index }}
-                    p={3}
-                    borderRadius="lg"
-                    _hover={{ bg: useColorModeValue("gray.50", "gray.700") }}
+                    p={3.5}
+                    borderBottom={index < 4 ? "1px solid" : "none"}
+                    borderColor={borderColor}
+                    _hover={{ 
+                      bg: useColorModeValue("gray.50", "gray.750"),
+                      transform: "translateX(2px)"
+                    }}
                     cursor="pointer"
+                    transition="all 0.2s"
                   >
-                    <HStack justify="space-between">
-                      <HStack flex={1}>
-                        <Box position="relative">
-                          <Avatar
-                            size="md"
-                            src={product.image}
-                            name={product.name}
-                            borderRadius="lg"
-                          />
-                          <Box
-                            position="absolute"
-                            top={-2}
-                            left={-2}
-                            bg="cyan.500"
-                            color="white"
-                            fontSize="xs"
-                            fontWeight="bold"
-                            w={5}
-                            h={5}
-                            borderRadius="full"
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                          >
-                            {index + 1}
-                          </Box>
-                        </Box>
-                        <VStack align="start" spacing={0} flex={1}>
-                          <Text fontSize="sm" fontWeight="bold" noOfLines={1}>
-                            {product.name}
-                          </Text>
-                          <Text fontSize="xs" color="gray.500">
+                    <HStack spacing={3} align="start">
+                      {/* Rank Badge */}
+                      <Box
+                        minW={6}
+                        h={6}
+                        borderRadius="md"
+                        bg={
+                          index === 0
+                            ? "blue.500"
+                            : index === 1
+                            ? "blue.400"
+                            : index === 2
+                            ? "blue.300"
+                            : useColorModeValue("gray.200", "gray.600")
+                        }
+                        color={index < 3 ? "white" : useColorModeValue("gray.700", "gray.300")}
+                        fontSize="xs"
+                        fontWeight="700"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        {index + 1}
+                      </Box>
+
+                      {/* Product Image */}
+                      <Box position="relative" flexShrink={0}>
+                        <Avatar
+                          size="md"
+                          src={product.image}
+                          name={product.name}
+                          borderRadius="lg"
+                          border="2px solid"
+                          borderColor={useColorModeValue("gray.100", "gray.700")}
+                        />
+                      </Box>
+
+                      {/* Product Details */}
+                      <VStack align="start" spacing={1} flex={1} minW={0}>
+                        <Text fontSize="sm" fontWeight="600" noOfLines={1}>
+                          {product.name}
+                        </Text>
+                        <HStack spacing={2} flexWrap="wrap">
+                          <Text fontSize="xs" fontWeight="700" color="blue.600">
                             ${product.price}
                           </Text>
-                        </VStack>
-                      </HStack>
-                      <VStack align="end" spacing={0}>
-                        <Icon as={FiTrendingUp} color="green.500" boxSize={5} />
-                        <Text fontSize="xs" color="green.500" fontWeight="bold">
-                          +{(Math.random() * 20 + 5).toFixed(1)}%
-                        </Text>
+                          <Text fontSize="xs" color="gray.400">
+                            •
+                          </Text>
+                          <Text fontSize="xs" color="gray.500">
+                            {totalSales} sold
+                          </Text>
+                        </HStack>
+                        
+                        {/* Sales Trend Bar */}
+                        <Box w="full" mt={1}>
+                          <HStack spacing={2} mb={1}>
+                            <Text fontSize="10px" color="gray.500" fontWeight="600" textTransform="uppercase">
+                              Sales trend
+                            </Text>
+                            <Badge
+                              colorScheme={isPositive ? "green" : "red"}
+                              fontSize="9px"
+                              px={1.5}
+                              py={0.5}
+                              borderRadius="sm"
+                              fontWeight="700"
+                            >
+                              {isPositive ? "+" : "-"}{salesGrowth}%
+                            </Badge>
+                          </HStack>
+                          <Progress
+                            value={parseFloat(salesGrowth)}
+                            size="xs"
+                            borderRadius="full"
+                            colorScheme={isPositive ? "green" : "red"}
+                            bg={useColorModeValue("gray.100", "gray.700")}
+                          />
+                        </Box>
                       </VStack>
+
+                      {/* Trend Icon */}
+                      <Icon
+                        as={isPositive ? FiTrendingUp : MdTrendingDown}
+                        color={isPositive ? "green.500" : "red.500"}
+                        boxSize={4}
+                        flexShrink={0}
+                      />
                     </HStack>
-                  </MotionBox>
-                ))}
-                {oldProduct.length === 0 && (
-                  <VStack py={8}>
-                    <Icon as={FiPackage} boxSize={12} color="gray.400" />
-                    <Text fontSize="sm" color="gray.500" textAlign="center">
-                      No products yet
-                    </Text>
-                  </VStack>
-                )}
-              </VStack>
-            </Box>
-          </MotionBox>
-        </GridItem>
-      </Grid>
-
-      {/* Additional Stats */}
-      <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={6}>
-        <GridItem>
-          <Box
-            bg={bg}
-            p={6}
-            borderRadius="xl"
-            boxShadow="md"
-            borderWidth="1px"
-            borderColor={useColorModeValue("gray.200", "gray.700")}
-          >
-            <Text fontSize="sm" color="gray.500" mb={2}>
-              Sales This Month
-            </Text>
-            <Text fontSize="2xl" fontWeight="bold" mb={4}>
-              $12,450
-            </Text>
-            <Progress
-              value={75}
-              colorScheme="cyan"
-              borderRadius="full"
-              size="sm"
-            />
-            <Text fontSize="xs" color="gray.500" mt={2}>
-              75% of monthly goal
-            </Text>
-          </Box>
-        </GridItem>
-
-        <GridItem>
-          <Box
-            bg={bg}
-            p={6}
-            borderRadius="xl"
-            boxShadow="md"
-            borderWidth="1px"
-            borderColor={useColorModeValue("gray.200", "gray.700")}
-          >
-            <Text fontSize="sm" color="gray.500" mb={2}>
-              Average Order Value
-            </Text>
-            <Text fontSize="2xl" fontWeight="bold" mb={4}>
-              ${avgPrice}
-            </Text>
-            <Progress
-              value={60}
-              colorScheme="blue"
-              borderRadius="full"
-              size="sm"
-            />
-            <Text fontSize="xs" color="gray.500" mt={2}>
-              Above average
-            </Text>
-          </Box>
-        </GridItem>
-
-        <GridItem>
-          <Box
-            bg={bg}
-            p={6}
-            borderRadius="xl"
-            boxShadow="md"
-            borderWidth="1px"
-            borderColor={useColorModeValue("gray.200", "gray.700")}
-          >
-            <Text fontSize="sm" color="gray.500" mb={2}>
-              Conversion Rate
-            </Text>
-            <Text fontSize="2xl" fontWeight="bold" mb={4}>
-              3.2%
-            </Text>
-            <Progress
-              value={32}
-              colorScheme="green"
-              borderRadius="full"
-              size="sm"
-            />
-            <Text fontSize="xs" color="gray.500" mt={2}>
-              Industry average: 2.8%
-            </Text>
+                  </Box>
+                );
+              })}
+              {oldProduct.length === 0 && (
+                <VStack py={8}>
+                  <Icon as={FiPackage} boxSize={12} color="gray.300" />
+                  <Text fontSize="sm" color="gray.500" textAlign="center" fontWeight="500">
+                    No products yet
+                  </Text>
+                  <Text fontSize="xs" color="gray.400" textAlign="center">
+                    Add products to see analytics
+                  </Text>
+                </VStack>
+              )}
+            </VStack>
           </Box>
         </GridItem>
       </Grid>

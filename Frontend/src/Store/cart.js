@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { getProductId } from '../utils/productIdHelper';
 
 const useCartStore = create(
   persist(
@@ -10,13 +11,14 @@ const useCartStore = create(
       // Add item to cart
       addToCart: (product) => {
         const cartItems = get().cartItems;
-        const existingItem = cartItems.find(item => item._id === product._id);
+        const productId = getProductId(product);
+        const existingItem = cartItems.find(item => getProductId(item) === productId);
 
         if (existingItem) {
           // If item exists, increase quantity
           set({
             cartItems: cartItems.map(item =>
-              item._id === product._id
+              getProductId(item) === productId
                 ? { ...item, quantity: item.quantity + 1 }
                 : item
             )
@@ -34,7 +36,7 @@ const useCartStore = create(
       // Remove item from cart
       removeFromCart: (productId) => {
         set({
-          cartItems: get().cartItems.filter(item => item._id !== productId)
+          cartItems: get().cartItems.filter(item => getProductId(item) !== productId)
         });
         return { success: true, message: "Removed from cart" };
       },
@@ -47,7 +49,7 @@ const useCartStore = create(
 
         set({
           cartItems: get().cartItems.map(item =>
-            item._id === productId
+            getProductId(item) === productId
               ? { ...item, quantity: quantity }
               : item
           )
@@ -59,7 +61,7 @@ const useCartStore = create(
       increaseQuantity: (productId) => {
         set({
           cartItems: get().cartItems.map(item =>
-            item._id === productId
+            getProductId(item) === productId
               ? { ...item, quantity: item.quantity + 1 }
               : item
           )
@@ -68,11 +70,11 @@ const useCartStore = create(
 
       // Decrease quantity by 1
       decreaseQuantity: (productId) => {
-        const item = get().cartItems.find(item => item._id === productId);
+        const item = get().cartItems.find(item => getProductId(item) === productId);
         if (item && item.quantity > 1) {
           set({
             cartItems: get().cartItems.map(item =>
-              item._id === productId
+              getProductId(item) === productId
                 ? { ...item, quantity: item.quantity - 1 }
                 : item
             )
@@ -104,12 +106,12 @@ const useCartStore = create(
 
       // Check if item is in cart
       isInCart: (productId) => {
-        return get().cartItems.some(item => item._id === productId);
+        return get().cartItems.some(item => getProductId(item) === productId);
       },
 
       // Get item quantity
       getItemQuantity: (productId) => {
-        const item = get().cartItems.find(item => item._id === productId);
+        const item = get().cartItems.find(item => getProductId(item) === productId);
         return item ? item.quantity : 0;
       }
     }),

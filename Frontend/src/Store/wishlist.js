@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { getProductId } from '../utils/productIdHelper';
 
 const useWishlistStore = create(
   persist(
@@ -10,10 +11,8 @@ const useWishlistStore = create(
       // Add item to wishlist
       addToWishlist: (product) => {
         const wishlistItems = get().wishlistItems;
-        const existingItem = wishlistItems.find(
-          item => item._id === product._id || 
-          (item.externalId && item.externalId === product.externalId)
-        );
+        const productId = getProductId(product);
+        const existingItem = wishlistItems.find(item => getProductId(item) === productId);
 
         if (existingItem) {
           return { success: false, message: "Already in wishlist" };
@@ -28,18 +27,17 @@ const useWishlistStore = create(
       // Remove item from wishlist
       removeFromWishlist: (productId) => {
         set({
-          wishlistItems: get().wishlistItems.filter(
-            item => item._id !== productId && item.externalId !== productId
-          )
+          wishlistItems: get().wishlistItems.filter(item => getProductId(item) !== productId)
         });
         return { success: true, message: "Removed from wishlist" };
       },
 
       // Toggle item in wishlist
       toggleWishlist: (product) => {
-        const isInWishlist = get().isInWishlist(product._id || product.externalId);
+        const productId = getProductId(product);
+        const isInWishlist = get().isInWishlist(productId);
         if (isInWishlist) {
-          return get().removeFromWishlist(product._id || product.externalId);
+          return get().removeFromWishlist(productId);
         } else {
           return get().addToWishlist(product);
         }
@@ -47,9 +45,7 @@ const useWishlistStore = create(
 
       // Check if item is in wishlist
       isInWishlist: (productId) => {
-        return get().wishlistItems.some(
-          item => item._id === productId || item.externalId === productId
-        );
+        return get().wishlistItems.some(item => getProductId(item) === productId);
       },
 
       // Clear entire wishlist

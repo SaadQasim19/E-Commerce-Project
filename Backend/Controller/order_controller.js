@@ -33,15 +33,36 @@ export const createOrder = async (req, res) => {
   const session = await mongoose.startSession();
 
   try {
+    // Debug logging
+    console.log('📦 Order Data Received:', JSON.stringify(orderData, null, 2));
+    console.log('📋 Items:', orderData.items);
+    
     //* Start transaction (ACID)
     await session.withTransaction(async () => {
       //^ 1) Validate and reserve stock for all items
       for (const item of orderData.items) {
-        const product = await Product.findById(item.productId).session(session);
+        console.log('🔍 Processing item:', item);
+        console.log('🆔 Product ID:', item.product);
+        console.log('📌 Product Source:', item.source);
+        
+        // Find product by either MongoDB _id or externalId
+        let product;
+        
+        if (item.source && item.source !== 'manual') {
+          // External product - search by externalId
+          product = await Product.findOne({ externalId: item.product }).session(session);
+          console.log('🌐 External product lookup by externalId:', item.product);
+        } else {
+          // Manual product - search by MongoDB _id
+          product = await Product.findById(item.product).session(session);
+          console.log('💾 Manual product lookup by _id:', item.product);
+        }
         
         if (!product) {
-          throw new Error(`Product ${item.productId} not found`);
+          throw new Error(`Product ${item.name || item.product} not found`);
         }
+        
+        console.log('✅ Product found:', product.name, '| Stock:', product.quantity);
 
         if (product.quantity < item.quantity) {
           throw new Error(
@@ -50,11 +71,13 @@ export const createOrder = async (req, res) => {
         }
 //* Transaction is used*/
         //^ Decrement stock atomically
+        // Build query based on product type
+        const updateQuery = item.source && item.source !== 'manual'
+          ? { externalId: item.product, quantity: { $gte: item.quantity } }
+          : { _id: item.product, quantity: { $gte: item.quantity } };
+        
         const updateResult = await Product.updateOne(
-          {
-            _id: item.productId,
-            quantity: { $gte: item.quantity } // Ensure stock hasn't changed
-          },
+          updateQuery,
           {
             $inc: { quantity: -item.quantity }
           },
@@ -66,7 +89,10 @@ export const createOrder = async (req, res) => {
         }
 
         // Check for low stock after decrement
-        const updatedProduct = await Product.findById(item.productId).session(session);
+        // Use the same lookup method as before
+        const updatedProduct = item.source && item.source !== 'manual'
+          ? await Product.findOne({ externalId: item.product }).session(session)
+          : await Product.findById(item.product).session(session);
         const LOW_STOCK_THRESHOLD = 10;
         
         if (updatedProduct.quantity <= LOW_STOCK_THRESHOLD && updatedProduct.quantity > 0) {

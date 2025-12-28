@@ -21,6 +21,7 @@ import {
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCartStore from '../Store/cart';
+import useAuthStore from '../Store/auth';
 import CartReview from '../Components/Checkout/CartReview';
 import ShippingForm from '../Components/Checkout/ShippingForm';
 import PaymentForm from '../Components/Checkout/PaymentForm';
@@ -42,6 +43,7 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const toast = useToast();
   const { cartItems: items, getTotalPrice, clearCart } = useCartStore();
+  const { user, token } = useAuthStore();
 
   const [shippingInfo, setShippingInfo] = useState({
     fullName: '',
@@ -95,16 +97,26 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
+      // Debug: Check cart items
+      console.log('🛒 Cart Items:', items);
+      
       // Prepare order data
       const orderData = {
-        items: items.map((item) => ({
-          product: item._id || item.externalId, // Handle both manual and external products
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          image: item.image,
-          source: item.source || 'manual', // Include source field
-        })),
+        userId: user?._id, // Add user ID if authenticated
+        items: items.map((item) => {
+          console.log('📦 Mapping item:', item);
+          console.log('🆔 Item _id:', item._id);
+          console.log('🆔 Item externalId:', item.externalId);
+          
+          return {
+            product: item._id || item.externalId, // Handle both manual and external products
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image,
+            source: item.source || 'manual', // Include source field
+          };
+        }),
         shippingInfo,
         paymentInfo: {
           method: paymentInfo.paymentMethod,
@@ -117,11 +129,14 @@ const CheckoutPage = () => {
         orderDate: new Date().toISOString(),
       };
 
+      console.log('📤 Sending order data:', orderData);
+
       // Send order to backend
       const response = await fetch('http://localhost:5000/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }), // Add auth token if available
         },
         body: JSON.stringify(orderData),
       });

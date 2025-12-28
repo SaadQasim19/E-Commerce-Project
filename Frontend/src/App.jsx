@@ -32,22 +32,24 @@ import AdminSettings from "./Pages/Admin/AdminSettings";
 import AdminProfile from "./Pages/Admin/AdminProfile";
 import UserProfile from "./Pages/UserProfile";
 import AdminProtectedRoute from "./Components/AdminProtectedRoute";
+import { SocketProvider } from "./contexts/SocketContext";
 import { Routes, Route } from "react-router-dom";
 
 function App() {
   console.log("App component rendered");
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route
-        path="/*"
-        element={
-          <Box minH={"100vh"} bg={useColorModeValue("gray.50", "gray.900")} display="flex" flexDirection="column">
-            <Navbar />
-            <Box flex="1">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/create" element={<CreatePage />} />
+    <SocketProvider>
+      <Routes>
+        {/* Public Routes */}
+        <Route
+          path="/*"
+          element={
+            <Box minH={"100vh"} bg={useColorModeValue("gray.50", "gray.900")} display="flex" flexDirection="column">
+              <Navbar />
+              <Box flex="1">
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/create" element={<CreatePage />} />
                 <Route path="/product/:id" element={<ProductDetailPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/orders" element={<OrdersPage />} />
@@ -93,6 +95,7 @@ function App() {
         <Route path="profile" element={<AdminProfile />} />
       </Route>
     </Routes>
+    </SocketProvider>
   );
 }
 

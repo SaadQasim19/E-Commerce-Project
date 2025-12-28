@@ -4,8 +4,10 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import session from "express-session";
+import { createServer } from "http";
 
 import { connectDB } from "./Config/db.js";
+import { initializeSocket } from "./Config/socket.js";
 import cors from 'cors';
 import passportConfig from "./Config/passport.js";
 import path from "path";
@@ -34,20 +36,20 @@ import externalProductRoutes from "./Routes/externalProduct_routes.js";
 
 const app = express();
 app.use(cors({
-  origin: 'http://localhost:5173', // Frontend URL
-  credentials: true, // Allow cookies to be sent
+  origin: 'http://localhost:5173', //~ Frontend URL
+  credentials: true, //~ Allow cookies to be sent
 }));
 
-// Serve uploaded files statically
+//& Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 //! Middleware
 //~ Without this, req.body will be undefined.
 //~ to parse incoming JSON requests and put the parsed data in -- req.body --
 app.use(express.json());
-app.use(cookieParser()); // Parse cookies
+app.use(cookieParser()); //~ Parse cookies
 
-// Session middleware (required for Passport)
+//* Session middleware (required for Passport)
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "your-session-secret-key",
@@ -60,7 +62,7 @@ app.use(
   })
 );
 
-// Initialize Passport
+//* Initialize Passport
 app.use(passportConfig.initialize());
 app.use(passportConfig.session());
 
@@ -73,25 +75,30 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/auth", socialAuthRoutes); // Social OAuth routes (Google, Facebook, GitHub)
-app.use("/api/settings", settingsRoutes); // Admin settings routes
-app.use("/api/users", uploadRoutes); // User profile & avatar upload routes
-app.use("/api/notifications", notificationRoutes); // Notification routes
-app.use("/api/promotions", promotionRoutes); // Promotional notification routes (Admin only)
-app.use("/api/external-products", externalProductRoutes); // External product API routes
+app.use("/api/auth", socialAuthRoutes); //& Social OAuth routes (Google, Facebook, GitHub)
+app.use("/api/settings", settingsRoutes); //& Admin settings routes
+app.use("/api/users", uploadRoutes); //& User profile & avatar upload routes
+app.use("/api/notifications", notificationRoutes); //& Notification routes
+app.use("/api/promotions", promotionRoutes); //& Promotional notification routes (Admin only)
+app.use("/api/external-products", externalProductRoutes); //& External product API routes
 
 
 
+//* Create HTTP server for Socket.IO
+const httpServer = createServer(app);
 
+//* Initialize Socket.IO
+initializeSocket(httpServer);
 
-app.listen(PORT, () => {
-  console.log('\n╔════════════════════════════════════════════╗');
-  console.log('║     E-Commerce Backend Server v1.0         ║');
-  console.log('╚════════════════════════════════════════════╝\n');
+httpServer.listen(PORT, () => {
+  
+  console.log('     E-Commerce Backend Server          ');
+
   
   connectDB();
   
-  console.log(`✓ Server running at http://localhost:${PORT}`);
-  console.log(`✓ Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+  console.log(` Server running at http://localhost:${PORT}`);
+  console.log(` Socket.IO enabled at ws://localhost:${PORT}`);
+  console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log('\n---------------------------------------------------\n');
 });

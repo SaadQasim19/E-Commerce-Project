@@ -26,7 +26,7 @@ export default function AvatarUpload({ currentAvatar, onUploadSuccess, userName 
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
   const toast = useToast();
-  const { token } = useAuthStore();
+  const { token, user, setUser } = useAuthStore();
 
   const borderColor = useColorModeValue("gray.300", "gray.600");
   const bgHover = useColorModeValue("gray.50", "gray.700");
@@ -114,6 +114,14 @@ export default function AvatarUpload({ currentAvatar, onUploadSuccess, userName 
       const data = await res.json();
 
       if (data.success) {
+        // Update auth store with new user data (including avatar)
+        if (data.user && user) {
+          setUser({
+            ...user,
+            avatar: data.avatar
+          });
+        }
+
         toast({
           title: "Success!",
           description: "Profile picture uploaded successfully",

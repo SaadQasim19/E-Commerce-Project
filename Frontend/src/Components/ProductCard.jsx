@@ -13,6 +13,7 @@ import ProductStore from "../Store/product";
 import useCartStore from "../Store/cart";
 import useWishlistStore from "../Store/wishlist";
 import StarRating from "./StarRating";
+import { getProductId } from "../utils/productIdHelper";
 
 const MotionBox = motion(Box);
 
@@ -266,17 +267,17 @@ const ProductCard = ({ product }) => {
         {/* Favorite Icon - Hidden for Admin */}
         {!isAdminAuthenticated && (
           <Box position="absolute" top={3} right={3} zIndex={2}>
-            <Tooltip label={isInWishlist(product._id || product.externalId) ? "Remove from Wishlist" : "Add to Wishlist"} placement="left">
+            <Tooltip label={isInWishlist(getProductId(product)) ? "Remove from Wishlist" : "Add to Wishlist"} placement="left">
               <IconButton
-                icon={isInWishlist(product._id || product.externalId) ? <FiHeart fill="currentColor" /> : <FiHeart />}
+                icon={isInWishlist(getProductId(product)) ? <FiHeart fill="currentColor" /> : <FiHeart />}
                 size="sm"
-                colorScheme={isInWishlist(product._id || product.externalId) ? "red" : "pink"}
+                colorScheme={isInWishlist(getProductId(product)) ? "red" : "pink"}
                 variant="solid"
                 borderRadius="full"
                 opacity={isHovered ? 1 : 0}
                 transform={isHovered ? "scale(1)" : "scale(0.8)"}
                 transition="all 0.3s"
-                aria-label={isInWishlist(product._id || product.externalId) ? "Remove from wishlist" : "Add to wishlist"}
+                aria-label={isInWishlist(getProductId(product)) ? "Remove from wishlist" : "Add to wishlist"}
                 onClick={handleToggleWishlist}
               />
             </Tooltip>
@@ -330,11 +331,11 @@ const ProductCard = ({ product }) => {
                 <Button
                   leftIcon={<FiShoppingCart />}
                   size="sm"
-                  colorScheme={isInCart(product._id) ? "green" : "cyan"}
+                  colorScheme={isInCart(getProductId(product)) ? "green" : "cyan"}
                   flex={1}
                   onClick={handleAddToCart}
                 >
-                  {isInCart(product._id) ? "In Cart" : "Add to Cart"}
+                  {isInCart(getProductId(product)) ? "In Cart" : "Add to Cart"}
                 </Button>
               )}
             </HStack>
@@ -408,7 +409,7 @@ const ProductCard = ({ product }) => {
             </Text>
           </VStack>
           
-          {isInCart(product._id) && (
+          {isInCart(getProductId(product)) && (
             <Badge colorScheme="green" px={2} py={1} borderRadius="md">
               In Cart
             </Badge>
