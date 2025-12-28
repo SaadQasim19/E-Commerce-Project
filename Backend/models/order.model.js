@@ -69,7 +69,7 @@ const orderSchema = new mongoose.Schema(
       method: {
         type: String,
         required: true,
-        enum: ["card", "paypal", "google", "apple"],
+        enum: ["card", "paypal", "google", "apple", "cod"],
       },
       lastFourDigits: {
         type: String,

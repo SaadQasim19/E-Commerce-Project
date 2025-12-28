@@ -66,8 +66,8 @@ const CheckoutPage = () => {
 
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Check if cart is empty
-  if (items.length === 0 && activeStep === 0) {
+  // Check if cart is empty - redirect to home
+  if (!items || items.length === 0) {
     return (
       <Container maxW="container.md" py={20}>
         <VStack spacing={6}>
@@ -97,13 +97,27 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
+      // Validate cart is not empty
+      if (!items || items.length === 0) {
+        toast({
+          title: 'Cart is Empty',
+          description: 'Please add items to your cart before placing an order.',
+          status: 'warning',
+          duration: 3000,
+          isClosable: true,
+        });
+        setIsProcessing(false);
+        navigate('/');
+        return;
+      }
+
       // Debug: Check cart items
       console.log('🛒 Cart Items:', items);
       
       // Prepare order data
       const orderData = {
         userId: user?._id, // Add user ID if authenticated
-        items: items.map((item) => {
+        items: items.filter(item => item && (item._id || item.externalId)).map((item) => {
           console.log('📦 Mapping item:', item);
           console.log('🆔 Item _id:', item._id);
           console.log('🆔 Item externalId:', item.externalId);
@@ -115,6 +129,8 @@ const CheckoutPage = () => {
             quantity: item.quantity,
             image: item.image,
             source: item.source || 'manual', // Include source field
+            category: item.category || 'general',
+            description: item.description || item.name,
           };
         }),
         shippingInfo,
@@ -122,7 +138,7 @@ const CheckoutPage = () => {
           method: paymentInfo.paymentMethod,
           // In production, never send full card details to backend
           // Use payment gateway tokens instead
-          lastFourDigits: paymentInfo.cardNumber.slice(-4),
+          lastFourDigits: paymentInfo.cardNumber ? paymentInfo.cardNumber.slice(-4) : '',
         },
         totalAmount: getTotalPrice() + 10 + (getTotalPrice() * 0.1), // Add shipping and tax
         status: 'pending',
@@ -143,8 +159,15 @@ const CheckoutPage = () => {
 
       const data = await response.json();
 
+      console.log('📥 Response data:', data);
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to place order');
+      }
+
+      // Check if order was created successfully
+      if (!data.order || !data.order._id) {
+        throw new Error('Order created but no order ID returned');
       }
 
       // Clear cart after successful order

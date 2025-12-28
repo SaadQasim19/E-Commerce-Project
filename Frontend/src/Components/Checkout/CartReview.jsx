@@ -20,11 +20,11 @@ const CartReview = () => {
   return (
     <Box>
       <Heading size="md" mb={6}>
-        Review Your Cart ({items.length} {items.length === 1 ? 'item' : 'items'})
+        Review Your Cart ({items?.length || 0} {items?.length === 1 ? 'item' : 'items'})
       </Heading>
 
       <VStack spacing={4} align="stretch">
-        {items.map((item) => (
+        {items?.filter(item => item && (item._id || item.externalId)).map((item) => (
           <Box
             key={item._id || item.externalId || item.name}
             p={4}

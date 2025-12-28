@@ -165,12 +165,12 @@ const OrderSummary = ({ shippingInfo, paymentInfo, items, subtotal }) => {
           shadow="sm"
         >
           <Heading size="md" mb={4}>
-            Order Items ({items.length})
+            Order Items ({items?.length || 0})
           </Heading>
 
           <VStack spacing={3} maxH="400px" overflowY="auto" pr={2}>
-            {items.map((item) => (
-              <HStack key={item._id} w="100%" spacing={3}>
+            {items?.filter(item => item && (item._id || item.externalId)).map((item) => (
+              <HStack key={item._id || item.externalId || item.name} w="100%" spacing={3}>
                 <Image
                   src={item.image}
                   alt={item.name}

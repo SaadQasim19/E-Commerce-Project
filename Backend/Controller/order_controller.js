@@ -38,7 +38,7 @@ export const createOrder = async (req, res) => {
     console.log('📋 Items:', orderData.items);
     
     //* Start transaction (ACID)
-    await session.withTransaction(async () => {
+    const createdOrder = await session.withTransaction(async () => {
       //^ 1) Validate and reserve stock for all items
       for (const item of orderData.items) {
         console.log('🔍 Processing item:', item);
@@ -52,14 +52,31 @@ export const createOrder = async (req, res) => {
           // External product - search by externalId
           product = await Product.findOne({ externalId: item.product }).session(session);
           console.log('🌐 External product lookup by externalId:', item.product);
+          
+          // If external product not found, create it
+          if (!product) {
+            console.log('⚠️  External product not in DB, creating from order data...');
+            const newProduct = await Product.create([{
+              externalId: item.product,
+              name: item.name,
+              price: item.price,
+              image: item.image,
+              source: item.source,
+              quantity: 1000, // Virtual stock for external products
+              category: item.category || 'general',
+              description: item.description || item.name,
+            }], { session });
+            product = newProduct[0];
+            console.log('✅ Auto-created external product:', product.name);
+          }
         } else {
           // Manual product - search by MongoDB _id
           product = await Product.findById(item.product).session(session);
           console.log('💾 Manual product lookup by _id:', item.product);
-        }
-        
-        if (!product) {
-          throw new Error(`Product ${item.name || item.product} not found`);
+          
+          if (!product) {
+            throw new Error(`Product ${item.name || item.product} not found`);
+          }
         }
         
         console.log('✅ Product found:', product.name, '| Stock:', product.quantity);
@@ -142,8 +159,8 @@ export const createOrder = async (req, res) => {
       return newOrder;
     });
 
-    // Transaction successful - get the created order
-    const createdOrder = await Order.findOne({ userId: orderData.userId }).sort({ createdAt: -1 });
+    // Transaction successful - createdOrder is the newOrder returned from transaction
+    console.log('✅ Order created:', createdOrder);
 
     res.status(201).json({
       success: true,
