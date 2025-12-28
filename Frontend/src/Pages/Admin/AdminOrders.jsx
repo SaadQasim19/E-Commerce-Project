@@ -37,7 +37,7 @@ export default function AdminOrders() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/orders");
+      const response = await fetch("http://localhost:5000/api/orders");
       const data = await response.json();
       
       if (data.success) {
@@ -58,7 +58,7 @@ export default function AdminOrders() {
 
   const handleStatusUpdate = async (orderId, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/orders/${orderId}/status`, {
+      const response = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
