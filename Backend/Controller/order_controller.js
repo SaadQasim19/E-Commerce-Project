@@ -339,3 +339,55 @@ export const deleteOrder = async (req, res) => {
     });
   }
 };
+
+// Get customers who have placed orders
+export const getCustomersWithOrders = async (req, res) => {
+  try {
+    // Aggregate orders to get unique customers with their order statistics
+    const customers = await Order.aggregate([
+      {
+        // Group by shipping info (customer details)
+        $group: {
+          _id: {
+            email: "$shippingInfo.email",
+            fullName: "$shippingInfo.fullName",
+            phone: "$shippingInfo.phone",
+          },
+          orderCount: { $sum: 1 },
+          totalSpent: { $sum: "$totalAmount" },
+          lastOrderDate: { $max: "$createdAt" },
+          orders: { $push: "$_id" },
+        }
+      },
+      {
+        // Reshape the output
+        $project: {
+          _id: 0,
+          email: "$_id.email",
+          fullName: "$_id.fullName",
+          phone: "$_id.phone",
+          orderCount: 1,
+          totalSpent: 1,
+          lastOrderDate: 1,
+          orders: 1,
+        }
+      },
+      {
+        // Sort by total spent (highest first)
+        $sort: { totalSpent: -1 }
+      }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      count: customers.length,
+      data: customers,
+    });
+  } catch (error) {
+    console.error("Error fetching customers:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server Error: Failed to fetch customers",
+    });
+  }
+};

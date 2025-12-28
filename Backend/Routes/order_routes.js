@@ -5,6 +5,7 @@ import {
   getOrderById,
   updateOrderStatus,
   deleteOrder,
+  getCustomersWithOrders,
 } from "../Controller/order_controller.js";
 
 const router = express.Router();
@@ -14,6 +15,9 @@ router.post("/", createOrder);
 
 // Get all orders
 router.get("/", getAllOrders);
+
+// Get customers who have placed orders
+router.get("/customers", getCustomersWithOrders);
 
 // Get a single order by ID
 router.get("/:id", getOrderById);
