@@ -26,6 +26,13 @@ import {
   FiStar,
 } from "react-icons/fi";
 
+// Import team images
+import SaadImage from "../Images/Saad.png";
+import DanishImage from "../Images/Danish.jpeg";
+import TahaImage from "../Images/Taha.jpeg";
+import HadiImage from "../Images/Hadi.jpeg";
+import NjafImage from "../Images/Njaf.jpeg";
+
 const MotionBox = motion.create(Box);
 
 export default function AboutUs() {
@@ -99,12 +106,11 @@ export default function AboutUs() {
   ];
 
   const team = [
-    { name: "Sarah Johnson", role: "CEO & Founder", avatar: "https://i.pravatar.cc/150?img=1" },
-    { name: "Michael Chen", role: "CTO", avatar: "https://i.pravatar.cc/150?img=13" },
-    { name: "Emily Rodriguez", role: "Head of Design", avatar: "https://i.pravatar.cc/150?img=5" },
-    { name: "David Kim", role: "Operations Manager", avatar: "https://i.pravatar.cc/150?img=12" },
-    { name: "Lisa Anderson", role: "Customer Success", avatar: "https://i.pravatar.cc/150?img=9" },
-    { name: "James Wilson", role: "Marketing Director", avatar: "https://i.pravatar.cc/150?img=14" },
+    { name: "Saad Qasim", role: "CEO & Founder", avatar: SaadImage },
+    { name: "Danish", role: "CTO", avatar: DanishImage },
+    { name: "Taha", role: "Head of Design", avatar: TahaImage },
+    { name: "Hadi", role: "Operations Manager", avatar: HadiImage },
+    { name: "Njaf", role: "Customer Success", avatar: NjafImage },
   ];
 
   const timeline = [
