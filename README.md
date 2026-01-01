@@ -11,13 +11,6 @@ This repository contains the **authentication and identity layer** of a modern f
 
 The system supports **traditional email/password authentication** as well as **Google OAuth 2.0**, integrated with JWT‑based session handling and secure cookie storage. The frontend provides a polished, accessible UI with real‑time validation and a modern user experience.
 
-This README is written for:
-
-* GitHub reviewers
-* Recruiters & interviewers
-* Open‑source contributors
-* Academic evaluation
-
 ---
 
 ## Key Capabilities
@@ -90,7 +83,7 @@ This README is written for:
 # Clone repository
 cd E-Commerce-Project
 
-# Install backend dependencies
+# Install backend dependencies (in root directory)
 npm install
 
 # Install frontend dependencies
@@ -107,7 +100,6 @@ All sensitive values are stored in environment variables.
 
 ```bash
 cd Backend
-cp .env.example .env
 ```
 
 Edit `.env` and provide your own credentials:
@@ -123,18 +115,6 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 
 ---
 
-### Google OAuth Setup
-
-Follow the official guide:
-👉 **[GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md)**
-
-Required callback URL:
-
-```
-http://localhost:5000/api/auth/google/callback
-```
-
----
 
 ### Running the Application
 
@@ -224,7 +204,7 @@ GitHub: [https://github.com/SaadQasim19](https://github.com/SaadQasim19)
 
 This repository intentionally focuses on **security, clarity, and professionalism**. It is designed to demonstrate real‑world authentication practices rather than experimental code.
 
-⭐ If you find this useful, consider starring the repository.
+If you find this useful, consider starring the repository ⭐
 
 ---
 
