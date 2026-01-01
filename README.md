@@ -44,32 +44,28 @@ The system supports **traditional email/password authentication** as well as **G
 * Accessible form components
 
 ---
+## Technology Stack
 
 <div align="center">
   
 **Frontend**
   
-<img src="https://skillicons.dev/icons?i=html,css,javascript,react,tailwind,bootstrap,ts" />
+<img src="https://skillicons.dev/icons?i=react" />
 
 **Backend**
 
-<img src="https://skillicons.dev/icons?i=nodejs,express,mongodb,mysql,graphql" />
-
-**Other Languages**
-
-<img src="https://skillicons.dev/icons?i=python,cpp,java,solidity" />
+<img src="https://skillicons.dev/icons?i=nodejs,express,mongodb,mysql" />
 
 **Tools**
 
-<img src="https://skillicons.dev/icons?i=linux,git,github,vscode,docker,postman,figma" />
+<img src="https://skillicons.dev/icons?i=linux,git,github,vscode,postman,figma" />
 
 </div>
 
-## Technology Stack
 
-### Frontend
 
-* React (Vite)
+### Remaining Frontend Technologies
+
 * Chakra UI
 * Zustand (state management)
 * React Router
@@ -77,9 +73,6 @@ The system supports **traditional email/password authentication** as well as **G
 
 ### Backend
 
-* Node.js
-* Express.js
-* MongoDB Atlas
 * Mongoose
 * Passport.js
 * JWT
