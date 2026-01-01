@@ -186,43 +186,6 @@ E-Commerce-Project/
 
 ---
 
-## API Overview (Authentication)
-
-```http
-POST   /api/auth/signup
-POST   /api/auth/login
-POST   /api/auth/logout
-GET    /api/auth/me
-PUT    /api/auth/update-password
-POST   /api/auth/forgot-password
-PUT    /api/auth/reset-password/:token
-```
-
-### Google OAuth
-
-```http
-GET    /api/auth/google
-GET    /api/auth/google/callback
-```
-
----
-
-## User Schema 
-
-```js
-{
-  name: String,
-  email: String,
-  password: String,      // hashed
-  googleId: String,
-  role: "user" | "admin",
-  resetPasswordToken: String,
-  resetPasswordExpire: Date,
-  createdAt: Date
-}
-```
-
----
 
 ## Security Notes
 
