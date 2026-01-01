@@ -45,6 +45,26 @@ The system supports **traditional email/password authentication** as well as **G
 
 ---
 
+<div align="center">
+  
+**Frontend**
+  
+<img src="https://skillicons.dev/icons?i=html,css,javascript,react,tailwind,bootstrap,ts" />
+
+**Backend**
+
+<img src="https://skillicons.dev/icons?i=nodejs,express,mongodb,mysql,graphql" />
+
+**Other Languages**
+
+<img src="https://skillicons.dev/icons?i=python,cpp,java,solidity" />
+
+**Tools**
+
+<img src="https://skillicons.dev/icons?i=linux,git,github,vscode,docker,postman,figma" />
+
+</div>
+
 ## Technology Stack
 
 ### Frontend
@@ -128,42 +148,25 @@ Backend/.env
 **Edit `Backend/.env`** with your own credentials:
 
 ```env
-# MongoDB Atlas Connection
+
 MONGO_URI=mongodb+srv://your-username:your-password@cluster.mongodb.net/ecommerce?appName=...
-
-# JWT Secret (use any random string)
 JWT_SECRET=your_super_secret_jwt_key_here
-
-# Session Secret (use any random string)
 SESSION_SECRET=your_session_secret_here
-
-# Google OAuth (optional - only if using Google login)
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-
-# Server Port
 PORT= your_own
 ```
 
-**Important:** Make sure your `MONGO_URI` includes the database name (e.g., `/ecommerce`) after `.mongodb.net/`
+**Note:** (May or Maynot ) your `MONGO_URI` includes the database name (e.g., `/ecommerce`) after `.mongodb.net/`
 
 ---
 
-
 ### Terminal 1: Start Backend Server
 
-**From the ROOT directory:**
+**From the Backend directory:**
 
 ```bash
-npm run dev
-```
-
-✅ Backend should start on: **http://localhost:5000**
-
-You should see:
-```
-🚀 Server is running on port 5000
-📦 MongoDB Connected
+node server.js
 ```
 
 ### Terminal 2: Start Frontend Server
