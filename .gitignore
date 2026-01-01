@@ -1,8 +1,9 @@
 node_modules/
 .env
 
-Notes/
 
 Documentation
+Notes/
+
 
 fix-mongodb-connection.sh
