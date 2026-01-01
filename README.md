@@ -62,7 +62,7 @@ The system supports **traditional email/password authentication** as well as **G
 
 </div>
 
-
+---
 
 ### Remaining Frontend Technologies
 
@@ -71,7 +71,7 @@ The system supports **traditional email/password authentication** as well as **G
 * React Router
 * Framer Motion
 
-### Backend
+### Remaining Backend Technologies
 
 * Mongoose
 * Passport.js
@@ -196,9 +196,9 @@ E-Commerce-Project/
 
 ---
 
-## 🆘 Troubleshooting
+## Troubleshooting
 
-### Backend Issues
+### Backend Possible Issue
 
 **Problem:** `Cannot connect to MongoDB`
 - ✅ Check your `MONGO_URI` in `Backend/.env`
@@ -206,9 +206,9 @@ E-Commerce-Project/
 - ✅ Verify database name is included in URI: `.mongodb.net/ecommerce?appName=...`
 
 
-## Developer
+## Developer 💻
 
-**Muhammad Saad Qasim**
+**Muhammad Saad Qasim** : 
 GitHub: [https://github.com/SaadQasim19](https://github.com/SaadQasim19)
 
 ---
@@ -216,3 +216,5 @@ GitHub: [https://github.com/SaadQasim19](https://github.com/SaadQasim19)
 If you find this useful, consider starring the repository ⭐
 
 ---
+
+**Happy coding. Securely.** 🚀
