@@ -67,145 +67,156 @@ The system supports **traditional email/password authentication** as well as **G
 
 ---
 
-## Getting Started
+# 🚀 Quick Setup Guide
 
-### Prerequisites
+## For New Developers Cloning This Repository
 
-* Node.js (v14+)
-* MongoDB Atlas account
-* Google Cloud Console account (OAuth)
+Follow these steps to get the E-Commerce project running on your local machine.
 
 ---
 
-### Installation
+## 📋 Prerequisites
+
+Before you begin, make sure you have:
+
+- ✅ **Node.js** (v14 or higher) - [Download](https://nodejs.org/)
+- ✅ **MongoDB Atlas account** - [Sign up](https://www.mongodb.com/cloud/atlas)
+- ✅ **Git** installed
+- ✅ **VS Code** (recommended) or any code editor
+
+---
+
+## 🔧 Installation Steps
+
+### Step 1: Clone the Repository
 
 ```bash
-# Clone repository
+git clone https://github.com/SaadQasim19/E-Commerce-Project.git
 cd E-Commerce-Project
+```
 
-# Install backend dependencies (in root directory)
+### Step 2: Install Backend Dependencies
+
+**Run this from the ROOT directory** (E-Commerce-Project/):
+
+```bash
 npm install
+```
 
-# Install frontend dependencies
+This installs all backend dependencies (Express, MongoDB, JWT, etc.) listed in the root `package.json`.
+
+### Step 3: Install Frontend Dependencies
+
+**Navigate to the Frontend folder** and install:
+
+```bash
 cd Frontend
 npm install
-cd ..
 ```
 
----
+This installs all frontend dependencies (React, Vite, Chakra UI, etc.).
 
-### Environment Configuration
+### Step 4: Set Up Environment Variables
 
-All sensitive values are stored in environment variables.
+Go back to the root directory and set up your `.env` file:
 
 ```bash
-cd Backend
+cd ..
+Backend/.env
 ```
 
-Edit `.env` and provide your own credentials:
+**Edit `Backend/.env`** with your own credentials:
 
 ```env
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-SESSION_SECRET=your_session_secret
+# MongoDB Atlas Connection
+MONGO_URI=mongodb+srv://your-username:your-password@cluster.mongodb.net/ecommerce?appName=...
+
+# JWT Secret (use any random string)
+JWT_SECRET=your_super_secret_jwt_key_here
+
+# Session Secret (use any random string)
+SESSION_SECRET=your_session_secret_here
+
+# Google OAuth (optional - only if using Google login)
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# Server Port
+PORT= your_own
 ```
 
+**Important:** Make sure your `MONGO_URI` includes the database name (e.g., `/ecommerce`) after `.mongodb.net/`
 
 ---
 
 
-### Running the Application
+### Terminal 1: Start Backend Server
 
-#### Backend
+**From the ROOT directory:**
 
 ```bash
-node Backend/server.js
+npm run dev
 ```
 
-#### Frontend
+✅ Backend should start on: **http://localhost:5000**
+
+You should see:
+```
+🚀 Server is running on port 5000
+📦 MongoDB Connected
+```
+
+### Terminal 2: Start Frontend Server
+
+**From the Frontend directory:**
 
 ```bash
 cd Frontend
 npm run dev
 ```
 
-Access:
-
-* Frontend: [http://localhost:5173](http://localhost:5173)
-* Backend API: [http://localhost:5000](http://localhost:5000)
-
----
-
-## Project Structure
+## 📁 Project Structure Quick Reference
 
 ```
 E-Commerce-Project/
+│
+├── package.json              ← Backend dependencies (npm install from HERE)
 ├── Backend/
+│   ├── .env                  ← Your environment variables
+│   ├── server.js             ← Backend entry point
 │   ├── Config/
-│   ├── Controllers/
-│   ├── Middleware/
-│   ├── Models/
-│   ├── Routes/
-│   ├── .env.example
-│   └── server.js
+│   ├── Controller/
+│   ├── models/
+│   └── Routes/
 │
-├── Frontend/
-│   ├── src/
-│   │   ├── Components/
-│   │   ├── Pages/
-│   │   ├── Store/
-│   │   └── App.jsx
-│   └── main.jsx
-│
-├── GOOGLE_OAUTH_SETUP.md
-├── DESIGN_IMPROVEMENTS.md
-└── README.md
+└── Frontend/
+    ├── package.json          ← Frontend dependencies (npm install from HERE)
+    ├── src/
+    │   ├── Components/
+    │   ├── Pages/
+    │   └── Store/            ← Zustand state management
+    └── vite.config.js
 ```
 
 ---
 
+## 🆘 Troubleshooting
 
-## Security Notes
+### Backend Issues
 
-* Passwords are **never stored in plain text**
-* OAuth users do not require passwords
-* Cookies are HTTP‑only
-* JWTs expire automatically
-* Role checks enforced on protected routes
+**Problem:** `Cannot connect to MongoDB`
+- ✅ Check your `MONGO_URI` in `Backend/.env`
+- ✅ Make sure your MongoDB Atlas IP whitelist includes your current IP (or use `0.0.0.0/0` for all IPs)
+- ✅ Verify database name is included in URI: `.mongodb.net/ecommerce?appName=...`
 
----
 
-## Contribution Policy
+## Developer
 
-This project is primarily educational and portfolio‑focused.
-
-* Issues and suggestions are welcome
-* Pull requests should follow clean code practices
-* No credentials or secrets in commits
-
----
-
-## License
-
-This project is intended for **educational and learning purposes**.
-
----
-
-## Author
-
-**Saad Qasim**
+**Muhammad Saad Qasim**
 GitHub: [https://github.com/SaadQasim19](https://github.com/SaadQasim19)
 
 ---
 
-## Final Notes
-
-This repository intentionally focuses on **security, clarity, and professionalism**. It is designed to demonstrate real‑world authentication practices rather than experimental code.
-
 If you find this useful, consider starring the repository ⭐
 
 ---
-
-**Happy coding. Securely.** 🔐🚀
